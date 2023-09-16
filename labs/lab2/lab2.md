@@ -61,13 +61,9 @@
     ```
     ```scheme
     (define (iterate f x n)
-      (let loop ((new_xs '())
-                (new_n n)
-                (x x))
-        (cond
-          ((= new_n 0) new_xs)
-          ((= new_n n) (loop (cons x '()) (- new_n 1) x))
-          (else (loop (append new_xs (cons (f x) '())) (- new_n 1) (f x))))))
+      (if (= n 0)
+        '()
+        (cons x (iterate f (f x) (- n 1)))))
     ```
 
 4.  Реализуйте процедуру `(intersperse e xs)`, которая возвращает
