@@ -132,4 +132,10 @@
     ((o) 1)       ⇒ 1
     ```
     ```scheme
+    (define (o . xs)
+      (define (compose funcs)
+        (if (null? funcs)
+          (lambda (x) (+ 0 x))
+          (lambda (x) ((car funcs) ((compose (cdr funcs)) x)))))
+      (compose xs))
     ```

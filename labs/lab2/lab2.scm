@@ -46,11 +46,9 @@
 
 
 ;; Number 6
-(define (f x) (+ x 2))
-(define (g x) (* x 3))
-(define (h x) (- x))
-
-;;(define (o . xs)
- ;; (if (null? xs)
-      
- ;; (lambda (x) (o . (cdr xs))))
+(define (o . xs)
+  (define (compose funcs)
+    (if (null? funcs)
+        (lambda (x) (+ 0 x))
+        (lambda (x) ((car funcs) ((compose (cdr funcs)) x)))))
+  (compose xs))
