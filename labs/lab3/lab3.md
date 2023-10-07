@@ -179,13 +179,13 @@
                 (newline)
                 #f)))
 
-(define (run-tests the-tests)
-    (let loop ((the-tests the-tests)
-               (all-tests-passed #t))
-        (cond
-            ((null? the-tests) all-tests-passed)
-            ((and (run-test (car the-tests)) all-tests-passed) (loop (cdr the-tests) #t))
-            (else (loop (cdr the-tests) #f)))))
+    (define (run-tests the-tests)
+        (let loop ((the-tests the-tests)
+                   (all-tests-passed #t))
+            (cond
+                ((null? the-tests) all-tests-passed)
+                ((and (run-test (car the-tests)) all-tests-passed) (loop (cdr the-tests) #t))
+                (else (loop (cdr the-tests) #f)))))
      
     ```
 
