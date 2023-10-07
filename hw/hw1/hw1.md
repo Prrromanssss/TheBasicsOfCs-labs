@@ -46,8 +46,6 @@
 (list 10 11)  → (10 11)
 ```
 
-## решение
-
 ``` scheme
     (define (sq a b c)
         (cond
@@ -84,8 +82,6 @@
 (prime? 11)        ⇒  #t
 (prime? 12)        ⇒  #f
 ```
-
-## решение
 
 ``` scheme
     (define (my-gcd a b)
