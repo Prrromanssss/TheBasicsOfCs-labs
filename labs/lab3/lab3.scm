@@ -133,7 +133,6 @@
 ;; (run-tests the-tests-ref)
 
 ;; Number 4
-
 (define (x xs)
   (cadadr xs))
 (define (y ys)
