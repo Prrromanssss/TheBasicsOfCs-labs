@@ -308,8 +308,8 @@
         (test (ref "123" -1 #\4) #f) ;; index out of range
     ))
     
-    (run-tests the-tests-ref)
-    (newline)
+    ;; (run-tests the-tests-ref)
+    ;; (newline)
     ```
 
 4.  Разработайте наборы юнит-тестов и используйте эти тесты для
@@ -345,5 +345,55 @@
     ```
 
     ``` scheme
-    
+    (define (x xs)
+        (cadadr xs))
+    (define (y ys)
+        (car (cdaddr ys)))
+  
+    (define (factorize expr)
+      (cond
+        ((and (equal? (car expr) '-) (equal? (car (cddadr expr)) 2))
+         `(* (- ,(x expr) ,(y expr))
+             (+ ,(x expr) ,(y expr))))
+        ((and (equal? (car expr) '-) (equal? (car (cddadr expr)) 3))
+         `(* (- ,(x expr) ,(y expr))
+             (+ (* ,(x expr) ,(x expr))
+                (* ,(x expr) ,(y expr))
+                (* ,(y expr) ,(y expr)))))
+        ((and (equal? (car expr) '+) (equal? (car (cddadr expr)) 3))
+         `(* (+ ,(x expr) ,(y expr))
+             (+  (* ,(x expr) ,(x expr))
+                 (- (* ,(x expr) ,(y expr)))
+                 (* ,(y expr) ,(y expr)))))))
+
+
+    (define the-tests-factorize
+      (list (test (factorize '(- (expt x 2) (expt y 2)))                          ;; a^2 - b^2
+                  '(* (- x y) (+ x y)))
+            (test (factorize '(- (expt (+ first 1) 2) (expt (- second 1) 2)))     ;; a^2 - b^2 (complex expr)
+                  '(* (- (+ first 1) (- second 1)) (+ (+ first 1) (- second 1))))
+            (test (eval (list (list 'lambda '(x y)                                ;; a^2 - b^2 with eval
+                          (factorize '(- (expt x 2) (expt y 2))))
+                    1 2) (interaction-environment)) 
+                  -3)
+            (test (factorize '(- (expt x 3) (expt y 3)))                          ;; a^3 - b^3
+                  '(* (- x y) (+ (* x x) (* x y) (* y y))))
+            (test (factorize '(- (expt (+ first 1) 3) (expt (- second 1) 3)))     ;; a^3 - b^3 (complex expr)
+                  '(* (- (+ first 1) (- second 1))
+                      (+ (* (+ first 1) (+ first 1))
+                         (* (+ first 1) (- second 1))
+                         (* (- second 1) (- second 1)))))
+            (test (factorize '(+ (expt x 3) (expt y 3)))                          ;; a^3 + b^3
+                  '(* (+ x y) (+ (* x x) (- (* x y)) (* y y))))
+            (test (factorize '(+ (expt (+ first 1) 3) (expt (- second 1) 3)))     ;; a^3 + b^3 (complex expr)
+                  '(* (+ (+ first 1) (- second 1))
+                      (+ (* (+ first 1) (+ first 1))
+                         (- (* (+ first 1) (- second 1)))
+                         (* (- second 1) (- second 1)))))
+    ))
+
+
+
+;; (run-tests the-tests-factorize)
+;; (newline)
     ```
