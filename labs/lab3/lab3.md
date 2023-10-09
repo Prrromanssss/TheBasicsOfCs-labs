@@ -393,8 +393,6 @@
                   '(+ (expt x 5) (expt y 5)))
     ))
 
-
-
-;; (run-tests the-tests-factorize)
-;; (newline)
+    ;; (run-tests the-tests-factorize)
+    ;; (newline)
     ```
