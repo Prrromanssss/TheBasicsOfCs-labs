@@ -2,12 +2,13 @@
 (define-syntax trace-ex
   (syntax-rules ()
     ((_ expr)
-      (let ((x expr))
-        (display 'expr)
-        (display " => ")
-        (display expr)
-        (newline)
-        expr))))
+     (begin
+       (write 'expr)
+       (display " => ")
+       (let ((x expr))
+         (write x)
+         (newline)
+         x)))))
 
 
 ;; Number 2
@@ -17,22 +18,21 @@
      (list (func . param) expected '(func . param)))))
 
 (define (run-test the-test)
-  (if (equal? (list-ref the-test 0) (list-ref the-test 1))
-    (begin
-      (write (list-ref the-test 2))
-      (display " ok\n")
-      #t
-    )
-    (begin
-      (write (list-ref the-test 2))
-      (display " FAIL\n")
-      (display "  Expected: ")
-      (write (list-ref the-test 1))
-      (newline)
-      (display "  Returned: ")
-      (write (list-ref the-test 0))
-      (newline)
-      #f)))
+  (if (equal? (car the-test) (cadr the-test))
+      (begin
+        (write (caddr the-test))
+        (display " ok\n")
+        #t)
+      (begin
+        (write (caddr the-test))
+        (display " FAIL\n")
+        (display "  Expected: ")
+        (write (cadr the-test))
+        (newline)
+        (display "  Returned: ")
+        (write (car the-test))
+        (newline)
+        #f)))
 
 (define (run-tests the-tests)
   (let loop ((the-tests the-tests)
@@ -48,46 +48,41 @@
   (if (null? xs)
       (cond
         ((list? var)
-          (if (< -1 ind (length var))
-            (list-ref var ind)
-            #f))
-        
+         (if (< -1 ind (length var))
+             (list-ref var ind)
+             #f))        
         ((string? var)
-          (if (< -1 ind (length (string->list var)))
-            (string-ref var ind)
-            #f))
-        
+         (if (< -1 ind (string-length var))
+             (string-ref var ind)
+             #f))       
         ((vector? var)
-          (if (< -1 ind (length (vector->list var)))
-            (vector-ref var ind)
-            #f)))
-
+         (if (< -1 ind (vector-length var))
+             (vector-ref var ind)
+             #f)))
       (cond
-        ((list? var) (insert-at var ind (list-ref xs 0)))
-
+        ((list? var) (insert-at var ind (car xs)))
         ((string? var)
-         (if (char? (list-ref xs 0))
-           (begin
-             (set! var (insert-at (string->list var) ind (list-ref xs 0)) )
+         (if (char? (car xs))
+             (begin
+               (set! var (insert-at (string->list var) ind (car xs)) )
                (if var
-                 (list->string var)
+                   (list->string var)
                    #f))
-            #f))
-
+             #f))
         ((vector? var)
-          (begin
-            (set! var (insert-at (vector->list var) ind (list-ref xs 0)))
-            (if var
-              (list->vector var)
-              #f))))))
+         (begin
+           (set! var (insert-at (vector->list var) ind (car xs)))
+           (if var
+               (list->vector var)
+               #f))))))
 
 (define (insert-at lst index value)
   (if (or (< index 0) (> index (length lst))) 
       #f
-  (cond
-    ((null? lst) (list value))
-    ((= 0 index) (cons value lst))
-    (else (cons (car lst) (insert-at (cdr lst) (- index 1) value ))))))
+      (cond
+        ((null? lst) (list value))
+        ((= 0 index) (cons value lst))
+        (else (cons (car lst) (insert-at (cdr lst) (- index 1) value ))))))
 
 (define the-tests-ref
   (list (test (ref '(1 2 3) 1) 2) ;; ok
@@ -128,7 +123,7 @@
         (test (ref "123" 1 #(4 5)) #f) ;; wrong type(vector)
         (test (ref "123" 5 #\4) #f) ;; index out of range
         (test (ref "123" -1 #\4) #f) ;; index out of range
-))
+        ))
 
 ;; (run-tests the-tests-ref)
 
@@ -161,8 +156,8 @@
         (test (factorize '(- (expt (+ first 1) 2) (expt (- second 1) 2)))     ;; a^2 - b^2 (complex expr)
               '(* (- (+ first 1) (- second 1)) (+ (+ first 1) (- second 1))))
         (test (eval (list (list 'lambda '(x y)                                ;; a^2 - b^2 with eval
-                      (factorize '(- (expt x 2) (expt y 2))))
-                1 2) (interaction-environment)) 
+                                (factorize '(- (expt x 2) (expt y 2))))
+                          1 2) (interaction-environment)) 
               -3)
         (test (factorize '(- (expt x 3) (expt y 3)))                          ;; a^3 - b^3
               '(* (- x y) (+ (* x x) (* x y) (* y y))))
@@ -178,7 +173,9 @@
                   (+ (* (+ first 1) (+ first 1))
                      (- (* (+ first 1) (- second 1)))
                      (* (- second 1) (- second 1)))))
-))
+        (test (factorize '(+ (expt x 5) (expt y 5)))                          ;; wrong parametrs
+              '(+ (expt x 5) (expt y 5)))
+        ))
 
 
 

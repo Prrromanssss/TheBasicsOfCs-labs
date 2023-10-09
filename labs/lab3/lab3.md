@@ -71,14 +71,15 @@
 
     ``` scheme
     (define-syntax trace-ex
-        (syntax-rules ()
-            ((_ expr)
-                (let ((x expr))
-                (display 'expr)
-                (display " => ")
-                (display expr)
-                (newline)
-                expr))))
+      (syntax-rules ()
+        ((_ expr)
+         (begin
+           (write 'expr)
+           (display " => ")
+           (let ((x expr))
+             (write x)
+             (newline)
+             x)))))
     ```
 
 2.  Юнит-тестирование — способ проверки корректности отдельных
@@ -163,21 +164,21 @@
                 (list (func . param) expected '(func . param)))))
 
     (define (run-test the-test)
-        (if (equal? (list-ref the-test 0) (list-ref the-test 1))
-            (begin
-                (write (list-ref the-test 2))
-                (display " ok\n")
-                #t)
-            (begin
-                (write (list-ref the-test 2))
-                (display " FAIL\n")
-                (display "  Expected: ")
-                (write (list-ref the-test 1))
-                (newline)
-                (display "  Returned: ")
-                (write (list-ref the-test 0))
-                (newline)
-                #f)))
+      (if (equal? (car the-test) (cadr the-test))
+          (begin
+            (write (caddr the-test))
+            (display " ok\n")
+            #t)
+          (begin
+            (write (caddr the-test))
+            (display " FAIL\n")
+            (display "  Expected: ")
+            (write (cadr the-test))
+            (newline)
+            (display "  Returned: ")
+            (write (car the-test))
+            (newline)
+            #f)))
 
     (define (run-tests the-tests)
         (let loop ((the-tests the-tests)
@@ -225,39 +226,37 @@
 
     ``` scheme
     (define (ref var ind . xs)
-        (if (null? xs)
-            (cond
-                ((list? var)
-                    (if (< -1 ind (length var))
-                        (list-ref var ind)
-                        #f))
-                ((string? var)
-                    (if (< -1 ind (length (string->list var)))
-                        (string-ref var ind)
-                        #f))
-                ((vector? var)
-                    (if (< -1 ind (length (vector->list var)))
-                        (vector-ref var ind)
-                        #f)))
+      (if (null? xs)
+          (cond
+            ((list? var)
+             (if (< -1 ind (length var))
+                 (list-ref var ind)
+                 #f))        
+            ((string? var)
+             (if (< -1 ind (string-length var))
+                 (string-ref var ind)
+                 #f))       
+            ((vector? var)
+             (if (< -1 ind (vector-length var))
+                 (vector-ref var ind)
+                 #f)))
+          (cond
+            ((list? var) (insert-at var ind (car xs)))
+            ((string? var)
+             (if (char? (car xs))
+                 (begin
+                   (set! var (insert-at (string->list var) ind (car xs)) )
+                   (if var
+                       (list->string var)
+                       #f))
+                 #f))
+            ((vector? var)
+             (begin
+               (set! var (insert-at (vector->list var) ind (car xs)))
+               (if var
+                   (list->vector var)
+                   #f))))))
 
-            (cond
-                ((list? var) (insert-at var ind (list-ref xs 0)))
-
-                ((string? var)
-                    (if (char? (list-ref xs 0))
-                        (begin
-                            (set! var (insert-at (string->list var) ind (list-ref xs 0)) )
-                            (if var
-                                (list->string var)
-                                #f))
-                        #f))
-
-                ((vector? var)
-                    (begin
-                        (set! var (insert-at (vector->list var) ind (list-ref xs 0)))
-                        (if var
-                            (list->vector var)
-                            #f))))))
 
     (define (insert-at lst index value)
         (if (or (< index 0) (> index (length lst))) 
@@ -390,6 +389,8 @@
                       (+ (* (+ first 1) (+ first 1))
                          (- (* (+ first 1) (- second 1)))
                          (* (- second 1) (- second 1)))))
+            (test (factorize '(+ (expt x 5) (expt y 5)))                          ;; wrong parametrs
+                  '(+ (expt x 5) (expt y 5)))
     ))
 
 
