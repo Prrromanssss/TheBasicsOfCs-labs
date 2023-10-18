@@ -42,13 +42,13 @@
 
 
 (define (all? pred? xs)
-      (or (null? xs) (and (pred? (car xs)) (any? pred? (cdr xs)))))
+      (or (null? xs) (and (pred? (car xs)) (all? pred? (cdr xs)))))
 
 
 ;; Number 6
 (define (o . xs)
   (define (compose funcs)
     (if (null? funcs)
-        (lambda (x) (+ 0 x))
+        (lambda (x) x)
         (lambda (x) ((car funcs) ((compose (cdr funcs)) x)))))
   (compose xs))
