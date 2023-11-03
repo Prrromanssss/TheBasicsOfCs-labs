@@ -144,9 +144,9 @@ FAILED: (not (zero? x))
 (последовательности чисел, которой первые три числа равны соответственно
 0, 0 и 1, а каждое последующее число — сумме предыдущих трех чисел):
 
-![Функция](https://github.com/Prrromanssss/TheBasicsOfCs-labs/raw/main/images/lab4-trib-domain.gif)
+![Функция](https://github.com/Prrromanssss/TheBasicsOfCs-labs/raw/main/images/lab4-trib.gif)
 
-![Область определения функции](https://github.com/Prrromanssss/TheBasicsOfCs-labs/raw/main/images/lab4-trib.gif)
+![Область определения функции](https://github.com/Prrromanssss/TheBasicsOfCs-labs/raw/main/images/lab4-trib-domain.gif)
 
 Реализуйте версию этой функции с мемоизацией результатов вычислений.
 Сравните время вычисления значения функций для разных (умеренно больших)
