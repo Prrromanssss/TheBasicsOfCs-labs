@@ -64,6 +64,7 @@
       ((equal? x (car xs)) (loop (+ i 1) (cdr xs)))
       (else (loop i (cdr xs))))))
 
+;; 1
 (define (list->set xs)
   (let loop ((new_xs '())
              (xs xs))
@@ -73,6 +74,7 @@
       (else (loop (append new_xs (cons (car xs) '())) (cdr xs))))))
 ;; (list->set '(1 1 2 3))
 
+;; 2
 (define (set? xs)
   (cond
     ((null? xs) #t)
@@ -82,25 +84,98 @@
 ;; (set? '(1 2 3 3))
 ;; (set? '())
 
+;; 3
 (define (union xs ys)
   (let loop ((new '())
              (xs xs)
              (ys ys))
     (cond
-      ((and (null? xs) (null? ys)) new)
-      ((null? xs) (loop (append new ys) xs '() ))
-      ((null? ys) (loop (append new xs) '() ys))
-      ((and (< (count (car xs) new) 1)
-            (< (count (car ys) (cons (car xs) new)) 1))
-       (loop (cons (car ys) (cons (car xs) new)) (cdr xs) (cdr ys)))
-      ((< (count (car xs) new) 1) (loop (cons (car xs) new) (cdr xs) (cdr ys)))
-      ((< (count (car ys) new) 1) (loop (cons (car ys) new) (cdr xs) (cdr ys))))))
+      ((null? xs) (list->set (append ys new)))
+      ((null? ys) (list->set (append xs new)))
+      (else
+       (loop (cons (car ys) (cons (car xs) new))
+             (cdr xs) (cdr ys))))))
 ;; (union '(1 2 3) '(2 3 4))
 
+;; 4
+(define (intersection xs ys)
+  (let loop ((new '())
+             (xs xs))
+    (cond
+      ((null? xs) (list->set new))
+      ((my-element? (car xs) ys)
+       (loop (cons (car xs) new) (cdr xs)))
+      (else (loop new (cdr xs))))))
+;; (intersection '(1 2 3) '(2 3 4)) 
 
-    
+;; 5
+(define (difference xs ys)
+  (let loop ((new '())
+             (xs xs))
+    (cond
+      ((null? xs) (list->set new))
+      ((not (my-element? (car xs) ys))
+       (loop (cons (car xs) new) (cdr xs)))
+      (else (loop new (cdr xs))))))
+;; (difference '(1 2 3 4 5) '(2 3))
+
+;; 6
+(define (symmetric-difference xs ys)
+  (let loop ((new '())
+             (xs xs)
+             (ys ys))
+    (cond
+      ((null? xs) (list->set (append ys new)))
+      ((null? ys) (list->set (append xs new)))
+      ((not (my-element? (car xs) ys))
+       (loop (cons (car xs) new) (cdr xs) ys))
+      ((not (my-element? (car ys) xs))
+       (loop (cons (car ys) new) xs (cdr ys)))
+      (else (loop new (cdr xs) (cdr ys))))))
+;; (symmetric-difference '(1 2 3 4) '(3 4 5 6))
       
+;; 7
+(define (set-eq? xs ys)
+  (let loop ((new_xs xs)
+             (new_ys ys))
+  (cond
+    ((and (null? new_xs) (null? new_ys)) #t)
+    ((and (null? new_xs) (not (null? new_ys))) #f)
+    ((and (not (null? new_xs)) (null? new_ys)) #f)
+    ((not (my-element? (car new_xs) ys)) #f)
+    ((not (my-element? (car new_ys) xs)) #f)
+    (else (loop (cdr new_xs) (cdr new_ys))))))
+;; (set-eq? '(1 2 3) '(3 2 1))
+;; (set-eq? '(1 2) '(1 3))
+
+
+;; Number 3
+
+
+;; Number 4
+
+
+;; Number 5
+(define (f x) (+ x 2))
+(define (g x) (* x 3))
+(define (h x) (- x))
+
+(define (o . xs)
+  (define (compose funcs)
+    (if (null? funcs)
+        (lambda (x) x)
+        (lambda (x) ((car funcs) ((compose (cdr funcs)) x)))))
+  (compose xs))
+;; ((o f g h) 1)
+;; ((o f g) 1)
+;; ((o h) 1)
+;; ((o) 1)
 
 
 
-      
+
+
+
+
+
+   
