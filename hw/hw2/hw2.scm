@@ -250,6 +250,52 @@
 
 ;; Number 4
 
+;; 1
+(define (make-multi-vector sizes . fill)
+  (vector 'multi-vector
+        sizes
+        (if (null? fill)
+            (make-vector (apply * sizes) 0)
+            (make-vector (apply * sizes) (car fill)))))
+(define m (make-multi-vector '(1 3 4 5)))
+
+;; 2
+(define (multi-vector? m)
+  (and
+    (not (list? m))
+    (not (string? m))
+    (not (number? m))
+    (not (char? m))
+    (equal? (vector-ref m 0) 'multi-vector)))
+
+(define (get-indices res sizes indices)
+  (cond
+    ((null? indices) res)
+    ((get-indices (+ (* res (car sizes)) (car indices))
+                  (cdr sizes) (cdr indices)))))
+
+;; 3
+(define (multi-vector-ref m indices)
+  (vector-ref (vector-ref m 2) 
+  (get-indices (car indices) (cdr (vector-ref m 1)) (cdr indices))))
+
+;; 4
+(define (multi-vector-set! m indices x)
+  (vector-set! (vector-ref m 2) 
+  (get-indices (car indices) (cdr (vector-ref m 1)) (cdr indices)) x))
+
+;; (define m (make-multi-vector '(11 12 9 16)))
+;; (multi-vector? m)
+;; (multi-vector-set! m '(10 7 6 12) 'test)
+;; (multi-vector-ref m '(10 7 6 12))
+;; Индексы '(1 2 1 1) и '(2 1 1 1) — разные индексы
+;; (multi-vector-set! m '(1 2 1 1) 'X)
+;; (multi-vector-set! m '(2 1 1 1) 'Y)
+;; (multi-vector-ref m '(1 2 1 1))
+;; (multi-vector-ref m '(2 1 1 1))
+
+;; (define m (make-multi-vector '(3 5 7) -1))
+;; (multi-vector-ref m '(0 0 0))
 
 ;; Number 5
 (define (f x) (+ x 2))
@@ -266,11 +312,3 @@
 ;; ((o f g) 1)
 ;; ((o h) 1)
 ;; ((o) 1)
-
-
-
-
-
-
-
-
