@@ -138,18 +138,94 @@
 (define (set-eq? xs ys)
   (let loop ((new_xs xs)
              (new_ys ys))
-  (cond
-    ((and (null? new_xs) (null? new_ys)) #t)
-    ((and (null? new_xs) (not (null? new_ys))) #f)
-    ((and (not (null? new_xs)) (null? new_ys)) #f)
-    ((not (my-element? (car new_xs) ys)) #f)
-    ((not (my-element? (car new_ys) xs)) #f)
-    (else (loop (cdr new_xs) (cdr new_ys))))))
+    (cond
+      ((and (null? new_xs) (null? new_ys)) #t)
+      ((and (null? new_xs) (not (null? new_ys))) #f)
+      ((and (not (null? new_xs)) (null? new_ys)) #f)
+      ((not (my-element? (car new_xs) ys)) #f)
+      ((not (my-element? (car new_ys) xs)) #f)
+      (else (loop (cdr new_xs) (cdr new_ys))))))
 ;; (set-eq? '(1 2 3) '(3 2 1))
 ;; (set-eq? '(1 2) '(1 3))
 
 
 ;; Number 3
+
+;; 1.1
+(define (string-trim-left str)
+  (define (list-trim-left lst)
+    (cond
+      ((null? lst) (list->string lst))
+      ((char-whitespace? (car lst))
+       (list-trim-left (cdr lst)))
+      (else (list->string lst))))
+  (list-trim-left (string->list str)))
+;; (string-trim-left  "\t\tabc def")
+
+;; 1.2
+(define (string-trim-right str)
+  (define (list-trim-right lst)
+    (cond
+      ((null? lst) (list->string (reverse lst)))
+      ((char-whitespace? (car lst))
+       (list-trim-right (cdr lst)))
+      (else (list->string (reverse lst)))))
+  (list-trim-right (reverse (string->list str))))
+;; (string-trim-right "abc def\t")
+
+;; 1.3
+(define (string-trim str)
+  (string-trim-left (string-trim-right str)))
+;; (string-trim       "\t abc def \n")
+
+;; 2.1
+(define (string-prefix? a b)
+  (define (list-prefix? aim lst is_prefix)
+    (cond
+      ((and (null? lst) (not (null? aim))) #f)
+      ((null? aim) is_prefix)
+      ((equal? (car aim) (car lst))
+       (list-prefix? (cdr aim) (cdr lst) #t))
+      (else #f)))
+  (list-prefix? (string->list a) (string->list b) #f))
+;; (string-prefix? "abc" "abcdef")
+;; (string-prefix? "bcd" "abcdef")
+;; (string-prefix? "abcdef" "abc")
+
+;; 2.2
+(define (string-suffix? a b)
+  (define (list-suffix? aim lst is_suffix)
+    (cond
+      ((and (null? lst) (not (null? aim))) #f)
+      ((null? aim) is_suffix)
+      ((equal? (car aim) (car lst))
+       (list-suffix? (cdr aim) (cdr lst) #t))
+      (else #f)))
+  (list-suffix?
+   (reverse (string->list a))
+   (reverse (string->list b))
+   #f))
+;; (string-suffix? "def" "abcdef")
+;; (string-suffix? "bcd" "abcdef")
+
+;; 2.3
+(define (string-infix? a b)
+  (cond
+    ((equal? b "") #f)
+    ((string-prefix? a b) #t)
+    (else
+     (string-infix? a
+     (list->string (cdr (string->list b)))))))
+;; (string-infix? "def" "adefcdefgh")
+;; (string-infix? "abc" "abcdefgh")
+;; (string-infix? "fgh" "abcdefgh")
+;; (string-infix? "ijk" "abcdefgh")
+;; (string-infix? "bcd" "abc")
+
+;; 3
+;; (define (string-split str sep))
+;; (string-split "x;y;z" ";")
+;; (string-split "x-->y-->z" "-->")
 
 
 ;; Number 4
@@ -178,4 +254,4 @@
 
 
 
-   
+      
