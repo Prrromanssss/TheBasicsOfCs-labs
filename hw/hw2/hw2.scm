@@ -215,7 +215,7 @@
     ((string-prefix? a b) #t)
     (else
      (string-infix? a
-     (list->string (cdr (string->list b)))))))
+                    (list->string (cdr (string->list b)))))))
 ;; (string-infix? "def" "adefcdefgh")
 ;; (string-infix? "abc" "abcdefgh")
 ;; (string-infix? "fgh" "abcdefgh")
@@ -223,7 +223,27 @@
 ;; (string-infix? "bcd" "abc")
 
 ;; 3
-;; (define (string-split str sep))
+(define (concat str1 str2)
+  (list->string
+   (append (string->list str1) (string->list str2))))
+
+(define (string-split str sep)
+  (let loop ((res '())
+             (str_to_add "")
+             (str str))
+    (cond
+      ((equal? str "") (append res (cons str_to_add '())))
+      ((string-prefix? sep str)   
+        (loop
+          (append res (cons str_to_add '()))
+          ""
+          (substring str (string-length sep) (string-length str))))
+      (else
+        (loop
+          res
+          (concat str_to_add (make-string 1 (string-ref str 0)))
+          (list->string (cdr (string->list str))))))))
+      
 ;; (string-split "x;y;z" ";")
 ;; (string-split "x-->y-->z" "-->")
 
@@ -254,4 +274,3 @@
 
 
 
-      
