@@ -316,7 +316,9 @@
         (lambda (x) x)
         (lambda (x) ((car funcs) ((compose (cdr funcs)) x)))))
   (compose xs))
+
 ;; ((o f g h) 1)
 ;; ((o f g) 1)
 ;; ((o h) 1)
 ;; ((o) 1)
+
