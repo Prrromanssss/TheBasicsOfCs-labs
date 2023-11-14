@@ -20,13 +20,16 @@
   (- (* b b) (* 4 a c)))
 
 ;; Number 3
-(define (my-gcd a b)
-  (if (= b 0)
-      a
-      (my-gcd b (remainder a b))))
+(define (my-gcd a b) 
+  (define (my-gcd-positive a b)
+    (if (= b 0)
+        a
+        (my-gcd-positive b (remainder a b))))
+  (my-gcd-positive (abs a) (abs b)))
+  
 
 (define (my-lcm a b)
-  (/ (* a b) (my-gcd a b)))
+  (/ (* (abs a) (abs b)) (my-gcd a b)))
 
 
 (define (prime? n)
@@ -36,4 +39,4 @@
        ((<= n 1) #f)
        ((<= cur 1) #t)
        ((= (/ n cur) (quotient n cur) ) #f)
-       (else (loop n (- cur 1)) ))))
+       (else (loop n (- cur 1))))))
