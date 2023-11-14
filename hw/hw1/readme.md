@@ -23,12 +23,31 @@
 
 ``` scheme
 (define (day-of-week day month year)
-    (set! month (remainder (+ month 10) 12) )
-    (cond ((= month 0) (inexact->exact (modulo (+ day (floor (- (* 2.6 12)      0.2)) (* (quotient year 100) -2) (- (modulo year 100) 1) (quotient (-   (modulo year 100) 1) 4) (quotient (quotient year 100) 4)) 7)))
+  (set! month (remainder (+ month 10) 12) )
+  (cond ((= month 0)
+         (inexact->exact (modulo (+
+                                  day
+                                  (floor (- (* 2.6 12) 0.2))
+                                  (* (quotient year 100) -2)
+                                  (- (modulo year 100) 1)
+                                  (quotient (- (modulo year 100) 1) 4)
+                                  (quotient (quotient year 100) 4)) 7)))
 
-        ((= month 11) (inexact->exact (modulo (+ day (floor (- (* 2.6 month) 0.2)) (* (quotient year 100) -2) (- (modulo year 100) 1)  (quotient (- (modulo year 100) 1) 4) (quotient (quotient year 100) 4)) 7)))
-    
-        (else (inexact->exact (modulo (+ day (floor (- (* 2.6 month) 0.2)) (* (quotient year 100) -2) (modulo year 100) (quotient (modulo year 100) 4) (quotient (quotient year 100) 4)) 7)))))
+      ((= month 11) (inexact->exact (modulo (+
+                                             day
+                                             (floor (- (* 2.6 month) 0.2))
+                                             (* (quotient year 100) -2)
+                                             (- (modulo year 100) 1)
+                                             (quotient (- (modulo year 100) 1) 4)
+                                             (quotient (quotient year 100) 4)) 7)))
+      
+      (else (inexact->exact (modulo (+
+                                     day
+                                     (floor (- (* 2.6 month) 0.2))
+                                     (* (quotient year 100) -2)
+                                     (modulo year 100)
+                                     (quotient (modulo year 100) 4)
+                                     (quotient (quotient year 100) 4)) 7)))))
 ```
 
 # 2. Действительные корни квадратного уравнения
