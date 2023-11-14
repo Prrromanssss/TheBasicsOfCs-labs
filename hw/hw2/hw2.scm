@@ -257,7 +257,7 @@
         (if (null? fill)
             (make-vector (apply * sizes) 0)
             (make-vector (apply * sizes) (car fill)))))
-(define m (make-multi-vector '(1 3 4 5)))
+;; (define m (make-multi-vector '(1 3 4 5)))
 
 ;; 2
 (define (multi-vector? m)
