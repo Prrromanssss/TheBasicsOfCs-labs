@@ -354,32 +354,32 @@
 
 ;; 2.1
 (define (string-prefix? a b)
-  (define (list-prefix? aim lst is_prefix)
+  (define (list-prefix? aim lst)
     (cond
       ((and (null? lst) (not (null? aim))) #f)
-      ((null? aim) is_prefix)
+      ((null? aim) #t)
       ((equal? (car aim) (car lst))
-       (list-prefix? (cdr aim) (cdr lst) #t))
+       (list-prefix? (cdr aim) (cdr lst)))
       (else #f)))
-  (list-prefix? (string->list a) (string->list b) #f))
+  (list-prefix? (string->list a) (string->list b)))
 
 ;; 2.2
 (define (string-suffix? a b)
-  (define (list-suffix? aim lst is_suffix)
+  (define (list-suffix? aim lst)
     (cond
       ((and (null? lst) (not (null? aim))) #f)
-      ((null? aim) is_suffix)
+      ((null? aim) #t)
       ((equal? (car aim) (car lst))
-       (list-suffix? (cdr aim) (cdr lst) #t))
+       (list-suffix? (cdr aim) (cdr lst)))
       (else #f)))
   (list-suffix?
    (reverse (string->list a))
-   (reverse (string->list b))
-   #f))
+   (reverse (string->list b))))
 
 ;; 2.3
 (define (string-infix? a b)
   (cond
+    ((equal? a "") #t)
     ((equal? b "") #f)
     ((string-prefix? a b) #t)
     (else
