@@ -599,7 +599,6 @@
 (define (h x) (- x))
 
 (newline)
-(newline)
 (display ((o f g h) 1))
 (newline)
 (display ((o f g) 1))
@@ -608,13 +607,6 @@
 (newline)
 (display ((o) 1))
 (newline)
-```
-
-``` example
--1
-5
--1
-1
 ```
 
 ## «Ачивки»
