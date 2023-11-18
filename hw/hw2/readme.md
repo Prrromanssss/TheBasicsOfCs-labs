@@ -461,31 +461,6 @@
 (newline)
 (display (string-split "-->xyz-->x-->abc" "-->"))
 (newline)
-(newline)
-
-(define (calc-last-whitespaces l)
-  (define (loop l res k)
-    (if (null? l)
-        (list res k)
-        (loop (cdr l)
-              (cons (car l) res)
-              (if (and (char? (car l)) (char-whitespace? (car l)))
-                  (+ k 1)
-                  0))))
-  (loop l '() 0))
-
-(define (list-trim-right l)
-  (define (loop res l k)
-    (if (null? l)
-        res
-        (if (= 0 k)
-            (loop (cons (car l) res) (cdr l) 0)
-            (loop res (cdr l) (- k 1)))))
-  (apply loop (cons '() (calc-last-whitespaces l))))
-
-(display (list-trim-right '((1) 2 3 #\space 5 #\space #\tab)))
-
-;; TODO: переделать без reverse
 ```
 
 ## 4. Многомерные вектора
@@ -624,7 +599,6 @@
 (define (h x) (- x))
 
 (newline)
-(newline)
 (display ((o f g h) 1))
 (newline)
 (display ((o f g) 1))
@@ -633,13 +607,6 @@
 (newline)
 (display ((o) 1))
 (newline)
-```
-
-``` example
--1
-5
--1
-1
 ```
 
 ## «Ачивки»
