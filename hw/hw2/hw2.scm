@@ -320,23 +320,26 @@
 ;; ((o) 1)
 
 
-;; Number 6
+;; Number 6(Achieves)
 
-;; 1.1
-(define (list-trim-right lst)
-  (cond
-    ((null? lst) '())
-    ((and (char? (car lst)) (char-whitespace? (car lst))) '())
-    (else (cons (car lst) (list-trim-right (cdr lst))))))
-;; (list-trim-right '(1 2 3 #\tab #\newline 6))
-
-;; 1.2
-(define (list-trim-right-tail lst)
-  (define (inner res lst)
-    (if (or (null? lst)
-            (and (char? (car lst)) (char-whitespace? (car lst))))
-        '()
-        (inner (cons (car lst) res) (cdr lst))))
-  (inner '() lst))
-
+(define (list-trim-right xs)
+  (define (get-count-whitespaces xs i)
+    (cond ((null? xs) i)
+          ((not (and (char? (car xs))
+                     (char-whitespace? (car xs))))
+           (get-count-whitespaces (cdr xs) 0))
+          ((and (char? (car xs)) (char-whitespace? (car xs)))
+           (get-count-whitespaces (cdr xs) (+ i 1)))))
+  
+  (let loop ((xs xs)
+             (last_ind (- (length xs) (get-count-whitespaces xs 0)))
+             (i 0)
+             (new_xs '()))
+    (if (equal? i last_ind)
+        new_xs
+        (loop (cdr xs) last_ind (+ i 1) (append new_xs (cons (car xs) '()))))))
 ;; (list-trim-right-tail '(1 2 3 #\tab #\newline 6))
+;; (list-trim-right '(#\space #\space #\space  #\space #\space #\space #\newline #\space #\tab))
+;; (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space #\space #\space #\newline #\space #\tab))
+;; (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space 6 #\space #\space #\newline #\space #\tab))
+;; (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space 6 #\space #\space 5 #\newline #\space #\tab))

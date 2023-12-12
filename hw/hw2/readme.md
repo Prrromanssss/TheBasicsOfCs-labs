@@ -659,3 +659,40 @@
 -   При решении задачи № 5 (композиция функций) воспользоваться одной
     из функций, написанных при решении одной из предыдущих задач.
     Решение должно получиться нерекурсивным. **+1 балл.**
+
+
+## 6. Ачивки(третья)
+
+```scheme
+(define (list-trim-right xs)
+  (define (get-count-whitespaces xs i)
+    (cond ((null? xs) i)
+          ((not (and (char? (car xs))
+                     (char-whitespace? (car xs))))
+           (get-count-whitespaces (cdr xs) 0))
+          ((and (char? (car xs)) (char-whitespace? (car xs)))
+           (get-count-whitespaces (cdr xs) (+ i 1)))))
+  
+  (let loop ((xs xs)
+             (last_ind (- (length xs) (get-count-whitespaces xs 0)))
+             (i 0)
+             (new_xs '()))
+    (if (equal? i last_ind)
+        new_xs
+        (loop (cdr xs) last_ind (+ i 1) (append new_xs (cons (car xs) '()))))))
+
+;; Test
+(newline)
+(display (list-trim-right-tail '(1 2 3 #\tab #\newline 6)))
+(newline)
+(display (list-trim-right '(#\space #\space #\space  #\space #\space #\space #\newline #\space #\tab)))
+(newline)
+(display (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space #\space #\space #\newline #\space #\tab)))
+(newline)
+(display (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space 6 #\space #\space #\newline #\space #\tab)))
+(newline)
+(display (list-trim-right '(#\space #\space (1) 2 3 #\space  #\space 6 #\space #\space 5 #\newline #\space #\tab)))
+(newline)
+(display (list-trim-right '((1) 2 3 6 5)))
+(newline)
+```
