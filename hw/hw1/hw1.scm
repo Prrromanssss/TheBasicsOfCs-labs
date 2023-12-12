@@ -27,7 +27,7 @@
                                      (quotient (quotient year 100) 4)) 7)))))
 
 ;; Number 2
-(define (sq a b c)
+(define (square-equation a b c)
   (cond
     ( (= 0 (D a b c)) (list (/ (- b) (* 2 a))))
     ( (> (D a b c) 0) (list (/ (+ (- b) (sqrt (D a b c))) (* 2 a)) (/ (- (- b) (sqrt (D a b c))) (* 2 a)) ))

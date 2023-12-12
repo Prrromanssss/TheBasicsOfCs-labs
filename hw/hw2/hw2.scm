@@ -1,13 +1,13 @@
 ;; Number 1
 
-;; 1
+;; 1 O(n)
 (define (my-range a b d)
   (if (>= a b)
       '()
       (cons a (my-range (+ a d) b d))))
 ;; (my-range  0 11 3)
 
-;; 2
+;; 2 O(n^2)
 (define (my-flatten xs)
   (cond
     ((null? xs) '())
@@ -15,7 +15,7 @@
     (else (list xs)) ))
 ;; (my-flatten '((1) 2 (3 (4 5)) 6))
 
-;; 3
+;; 3 O(n)
 (define (my-element? x xs)
   (cond
     ((null? xs) #f)
@@ -24,7 +24,7 @@
 ;; (my-element? 1 '(3 2 1))
 ;; (my-element? 4 '(3 2 1))
 
-;; 4
+;; 4 O(n)
 (define (my-filter pred? xs)
   (let loop ((new_xs '())
              (xs xs))
@@ -35,7 +35,7 @@
 ;; (my-filter odd? (my-range 0 10 1))
 ;; (my-filter (lambda (x) (= (remainder x 3) 0)) (my-range 0 13 1))
 
-;; 5
+;; 5 O(n)
 (define (my-fold-left op xs)
   (let my-fold-left-reverse ((op op)
                              (xs (reverse xs)))
@@ -45,7 +45,7 @@
 ;; (my-fold-left  quotient '(16 2 2 2 2))
 ;; (my-fold-left  quotient '(1))
 
-;; 6
+;; 6 O(n)
 (define (my-fold-right op xs)
   (if (null? (cdr xs))
       (car xs)
@@ -64,7 +64,7 @@
       ((equal? x (car xs)) (loop (+ i 1) (cdr xs)))
       (else (loop i (cdr xs))))))
 
-;; 1
+;; 1 O(n^2)
 (define (list->set xs)
   (let loop ((new_xs '())
              (xs xs))
@@ -74,7 +74,7 @@
       (else (loop (append new_xs (cons (car xs) '())) (cdr xs))))))
 ;; (list->set '(1 1 2 3))
 
-;; 2
+;; 2 O(n^2)
 (define (set? xs)
   (cond
     ((null? xs) #t)
@@ -84,7 +84,7 @@
 ;; (set? '(1 2 3 3))
 ;; (set? '())
 
-;; 3
+;; 3 O(n^2)
 (define (union xs ys)
   (let loop ((new '())
              (xs xs)
@@ -97,7 +97,7 @@
              (cdr xs) (cdr ys))))))
 ;; (union '(1 2 3) '(2 3 4))
 
-;; 4
+;; 4 O(n^2)
 (define (intersection xs ys)
   (let loop ((new '())
              (xs xs))
@@ -108,7 +108,7 @@
       (else (loop new (cdr xs))))))
 ;; (intersection '(1 2 3) '(2 3 4)) 
 
-;; 5
+;; 5 O(n^2)
 (define (difference xs ys)
   (let loop ((new '())
              (xs xs))
@@ -119,7 +119,7 @@
       (else (loop new (cdr xs))))))
 ;; (difference '(1 2 3 4 5) '(2 3))
 
-;; 6
+;; 6 O(n^2)
 (define (symmetric-difference xs ys)
   (let loop ((new '())
              (xs xs)
@@ -134,7 +134,7 @@
       (else (loop new (cdr xs) (cdr ys))))))
 ;; (symmetric-difference '(1 2 3 4) '(3 4 5 6))
       
-;; 7
+;; 7 O(n^2)
 (define (set-eq? xs ys)
   (let loop ((new_xs xs)
              (new_ys ys))
@@ -151,7 +151,7 @@
 
 ;; Number 3
 
-;; 1.1
+;; 1.1 O(n)
 (define (string-trim-left str)
   (define (list-trim-left lst)
     (cond
@@ -162,7 +162,7 @@
   (list-trim-left (string->list str)))
 ;; (string-trim-left  "\t\tabc def")
 
-;; 1.2
+;; 1.2 O(n)
 (define (string-trim-right str)
   (define (list-trim-right lst)
     (cond
@@ -173,12 +173,12 @@
   (list-trim-right (reverse (string->list str))))
 ;; (string-trim-right "abc def\t")
 
-;; 1.3
+;; 1.3 O(n)
 (define (string-trim str)
   (string-trim-left (string-trim-right str)))
 ;; (string-trim       "\t abc def \n")
 
-;; 2.1
+;; 2.1 O(n)
 (define (string-prefix? a b)
   (define (list-prefix? aim lst)
     (cond
@@ -195,7 +195,7 @@
 ;; (string-prefix? "" "")
 ;; (string-prefix? "abc" "")
 
-;; 2.2
+;; 2.2 O(n)
 (define (string-suffix? a b)
   (define (list-suffix? aim lst)
     (cond
@@ -213,7 +213,7 @@
 ;; (string-suffix? "" "")
 ;; (string-suffix? "abcdef" "")
 
-;; 2.3
+;; 2.3 O(n^2)
 (define (string-infix? a b)
   (cond
     ((equal? a "") #t)
@@ -230,11 +230,11 @@
 ;; (string-infix? "" "abc")
 ;; (string-infix? "" "")
 
-;; 3
 (define (concat str1 str2)
   (list->string
    (append (string->list str1) (string->list str2))))
 
+;; 3 O(n^2)
 (define (string-split str sep)
   (let loop ((res '())
              (str_to_add "")
@@ -270,10 +270,7 @@
 ;; 2
 (define (multi-vector? m)
   (and
-    (not (list? m))
-    (not (string? m))
-    (not (number? m))
-    (not (char? m))
+    (vector? m)
     (equal? (vector-ref m 0) 'multi-vector)))
 
 (define (get-indices res sizes indices)
@@ -322,3 +319,24 @@
 ;; ((o h) 1)
 ;; ((o) 1)
 
+
+;; Number 6
+
+;; 1.1
+(define (list-trim-right lst)
+  (cond
+    ((null? lst) '())
+    ((and (char? (car lst)) (char-whitespace? (car lst))) '())
+    (else (cons (car lst) (list-trim-right (cdr lst))))))
+;; (list-trim-right '(1 2 3 #\tab #\newline 6))
+
+;; 1.2
+(define (list-trim-right-tail lst)
+  (define (inner res lst)
+    (if (or (null? lst)
+            (and (char? (car lst)) (char-whitespace? (car lst))))
+        '()
+        (inner (cons (car lst) res) (cdr lst))))
+  (inner '() lst))
+
+;; (list-trim-right-tail '(1 2 3 #\tab #\newline 6))

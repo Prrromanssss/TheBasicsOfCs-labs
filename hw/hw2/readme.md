@@ -44,27 +44,27 @@
 ```
 
 ``` scheme
-;; 1
+;; 1 O(n)
 (define (my-range a b d)
   (if (>= a b)
       '()
       (cons a (my-range (+ a d) b d))))
 
-;; 2
+;; 2 O(n^2)
 (define (my-flatten xs)
   (cond
     ((null? xs) '())
     ((list? xs) (append (my-flatten (car xs)) (my-flatten (cdr xs))))
     (else (list xs)) ))
 
-;; 3
+;; 3 O(n)
 (define (my-element? x xs)
   (cond
     ((null? xs) #f)
     ((equal? x (car xs)) #t)
     (else (my-element? x (cdr xs)))))
 
-;; 4
+;; 4 O(n)
 (define (my-filter pred? xs)
   (let loop ((new_xs '())
              (xs xs))
@@ -73,7 +73,7 @@
       ((not (pred? (car xs))) (loop new_xs (cdr xs)))
       (else (loop (append new_xs (cons (car xs) '())) (cdr xs))))))
 
-;; 5
+;; 5 O(n)
 (define (my-fold-left op xs)
   (let my-fold-left-reverse ((op op)
                              (xs (reverse xs)))
@@ -81,13 +81,14 @@
         (car xs)
         (op (my-fold-left-reverse op (cdr xs)) (car xs)))))
 
-;; 6
+;; 6 O(n)
 (define (my-fold-right op xs)
   (if (null? (cdr xs))
       (car xs)
       (op (car xs) (my-fold-right op (cdr xs)))))
 
 
+;; Test 1
 (newline)
 (display (my-range 0 11 3))
 (newline)
@@ -95,6 +96,7 @@
 (newline)
 (newline)
 
+;; Test 2
 (display (my-flatten '((1) 2 (3 (4 5)) 6)))
 (newline)
 (display (my-flatten '()))
@@ -107,24 +109,29 @@
 (newline)
 (newline)
 
+;; Test 3
 (display (my-element? 1 '(3 2 1)))
 (newline)
 (display (my-element? 4 '(3 2 1)))
 (newline)
 (newline)
 
+
+;; Test 4
 (display (my-filter odd? (my-range 0 10 1)))
 (newline)
 (display (my-filter (lambda (x) (= (remainder x 3) 0)) (my-range 0 13 1)))
 (newline)
 (newline)
 
+;; Test 5
 (display (my-fold-left  quotient '(16 2 2 2 2)))
 (newline)
 (display (my-fold-left  quotient '(1)))
 (newline)
 (newline)
 
+;; Test 6
 (display (my-fold-right expt '(2 3 4)))
 (newline)
 (display (my-fold-right expt '(2)))
@@ -174,7 +181,7 @@
       ((equal? x (car xs)) (loop (+ i 1) (cdr xs)))
       (else (loop i (cdr xs))))))
 
-;; 1
+;; 1 O(n^2)
 (define (list->set xs)
   (let loop ((new_xs '())
              (xs xs))
@@ -182,15 +189,16 @@
       ((null? xs) new_xs)
       ((> (count (car xs) xs) 1) (loop new_xs (cdr xs)))
       (else (loop (append new_xs (cons (car xs) '())) (cdr xs))))))
+;; (list->set '(1 1 2 3))
 
-;; 2
+;; 2 O(n^2)
 (define (set? xs)
   (cond
     ((null? xs) #t)
     ((> (count (car xs) xs) 1) #f)
     (else (set? (cdr xs)))))
 
-;; 3
+;; 3 O(n^2)
 (define (union xs ys)
   (let loop ((new '())
              (xs xs)
@@ -202,7 +210,7 @@
        (loop (cons (car ys) (cons (car xs) new))
              (cdr xs) (cdr ys))))))
 
-;; 4
+;; 4 O(n^2)
 (define (intersection xs ys)
   (let loop ((new '())
              (xs xs))
@@ -212,7 +220,7 @@
        (loop (cons (car xs) new) (cdr xs)))
       (else (loop new (cdr xs))))))
 
-;; 5
+;; 5 O(n^2)
 (define (difference xs ys)
   (let loop ((new '())
              (xs xs))
@@ -222,7 +230,7 @@
        (loop (cons (car xs) new) (cdr xs)))
       (else (loop new (cdr xs))))))
 
-;; 6
+;; 6 O(n^2)
 (define (symmetric-difference xs ys)
   (let loop ((new '())
              (xs xs)
@@ -236,7 +244,7 @@
        (loop (cons (car ys) new) xs (cdr ys)))
       (else (loop new (cdr xs) (cdr ys))))))
       
-;; 7
+;; 7 O(n^2)
 (define (set-eq? xs ys)
   (let loop ((new_xs xs)
              (new_ys ys))
@@ -249,10 +257,12 @@
       (else (loop (cdr new_xs) (cdr new_ys))))))
 
 
+;; Test 1
 (newline)
 (display (list->set '(1 1 2 3)))
 (newline)
 
+;; Test 2
 (newline)
 (display (set? '(1 2 3)))
 (newline)
@@ -261,18 +271,27 @@
 (display (set? '()))
 (newline)
 
+;; Test 3
 (newline)
 (display (union '(1 2 3) '(2 3 4)))
 (newline)
+
+;; Test 4
 (newline)
 (display (intersection '(1 2 3) '(2 3 4)))
 (newline)
+
+;; Test 5
 (newline)
 (display (difference '(1 2 3 4 5) '(2 3)))
 (newline)
+
+;; Test 6
 (newline)
 (display (symmetric-difference '(1 2 3 4) '(3 4 5 6)))
 (newline)
+
+;; Test 7
 (newline)
 (display (set-eq? '(1 2 3) '(3 2 1)))
 (newline)
@@ -328,7 +347,7 @@
 ```
 
 ``` scheme
-;; 1.1
+;; 1.1 O(n)
 (define (string-trim-left str)
   (define (list-trim-left lst)
     (cond
@@ -338,7 +357,7 @@
       (else (list->string lst))))
   (list-trim-left (string->list str)))
 
-;; 1.2
+;; 1.2 O(n)
 (define (string-trim-right str)
   (define (list-trim-right lst)
     (cond
@@ -348,11 +367,11 @@
       (else (list->string (reverse lst)))))
   (list-trim-right (reverse (string->list str))))
 
-;; 1.3
+;; 1.3 O(n)
 (define (string-trim str)
   (string-trim-left (string-trim-right str)))
 
-;; 2.1
+;; 2.1 O(n)
 (define (string-prefix? a b)
   (define (list-prefix? aim lst)
     (cond
@@ -363,7 +382,7 @@
       (else #f)))
   (list-prefix? (string->list a) (string->list b)))
 
-;; 2.2
+;; 2.2 O(n)
 (define (string-suffix? a b)
   (define (list-suffix? aim lst)
     (cond
@@ -376,7 +395,7 @@
    (reverse (string->list a))
    (reverse (string->list b))))
 
-;; 2.3
+;; 2.3 O(n^2)
 (define (string-infix? a b)
   (cond
     ((equal? a "") #t)
@@ -386,11 +405,11 @@
      (string-infix? a
                     (list->string (cdr (string->list b)))))))
 
-;; 3
 (define (concat str1 str2)
   (list->string
    (append (string->list str1) (string->list str2))))
 
+;; 3 O(n^2)
 (define (string-split str sep)
   (let loop ((res '())
              (str_to_add "")
@@ -409,14 +428,24 @@
           (list->string (cdr (string->list str))))))))
 
 
+;; Test 1.1
+(newline)
 (display (string-trim-left "\t\tabc def"))
 (newline)
+
+;; Test 1.2
+(newline)
 (display (string-trim-right "abc def\t"))
+(newline)
+
+;; Test 1.3
 (newline)
 (display (string-trim "\t abc def \n"))
 (newline)
 (newline)
 
+;; Test 2.1
+(newline)
 (display (string-prefix? "abc" "abcdef"))
 (newline)
 (display (string-prefix? "bcd" "abcdef"))
@@ -425,8 +454,9 @@
 (newline)
 (display (string-prefix? "" ""))
 (newline)
-(newline)
 
+;; Test 2.2
+(newline)
 (display (string-suffix? "def" "abcdef"))
 (newline)
 (display (string-suffix? "bcd" "abcdef"))
@@ -435,8 +465,9 @@
 (newline)
 (display (string-suffix? "abcdef" "def"))
 (newline)
-(newline)
 
+;; Test 2.3
+(newline)
 (display (string-infix? "def" "abcdefgh"))
 (newline)
 (display (string-infix? "abc" "abcdefgh"))
@@ -449,8 +480,9 @@
 (newline)
 (display (string-infix? "abcd" "abc"))
 (newline)
-(newline)
 
+;; Test 3
+(newline)
 (display (string-split "x;y;z" ";"))
 (newline)
 (display (string-split "x-->y-->z" "-->"))
@@ -515,10 +547,7 @@
 ;; 2
 (define (multi-vector? m)
   (and
-    (not (list? m))
-    (not (string? m))
-    (not (number? m))
-    (not (char? m))
+    (vector? m)
     (equal? (vector-ref m 0) 'multi-vector)))
 
 (define (get-indices res sizes indices)
@@ -537,6 +566,7 @@
   (vector-set! (vector-ref m 2) 
   (get-indices (car indices) (cdr (vector-ref m 1)) (cdr indices)) x))
 
+;; Test 1-4
 (define m (make-multi-vector '(11 12 9 16)))
 (display (multi-vector? m))
 (newline)
@@ -598,6 +628,7 @@
 (define (g x) (* x 3))
 (define (h x) (- x))
 
+;; Test
 (newline)
 (display ((o f g h) 1))
 (newline)
