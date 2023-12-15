@@ -87,7 +87,8 @@
               
               ;; executing previously defined  article
               ((assoc current_symb env)
-               (inner new_stack (cadr (assoc current_symb env)) func-ignore (cons (+ ind 1) return) if-ignore))
+               (inner new_stack (cadr (assoc current_symb env))
+                      func-ignore (cons (+ ind 1) return) if-ignore))
               
               ;; if-statement
               ((equal? current_symb 'if)
@@ -306,7 +307,3 @@
               '(-1 0))))
 
 ;; (run-tests tests)
-
-
-
-
