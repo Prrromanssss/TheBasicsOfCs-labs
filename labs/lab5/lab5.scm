@@ -1,60 +1,99 @@
-;; (load "unit-test.scm")
 (load "../lab3/lab3.scm")
 
 
 (define (interpret program stack)
   (let ((env '())
         (oper_with_stack '(+ - * /
-                           mod neg drop swap
-                           dup over rot and
-                           = > < not or depth)))
-    (let inner ((program program)
-                (loc_stack stack))
-      (if (equal? program #())
+                             mod neg drop swap
+                             dup over rot and
+                             = > < not or depth))
+        (end (vector-length program)))
+    
+    (let inner ((loc_stack stack)
+                (ind 0)
+                (func-ignore #f)
+                (return '())
+                (if-ignore #f))
+      (if (equal? ind end)
           loc_stack
-          (let* ((current_symb (vector-ref program 0))
-                 (new_program
-                  (list->vector (cdr (vector->list program))))
-                 (new_stack
-                  (case current_symb
-                    ('+ (+$ loc_stack))
-                    ('- (-$ loc_stack))
-                    ('* (*$ loc_stack))
-                    ('/ (/$ loc_stack))
-                    ('mod (mod$ loc_stack))
-                    ('neg (neg$ loc_stack))
-                    ('drop (drop$ loc_stack))
-                    ('swap (swap$ loc_stack))
-                    ('dup (dup$ loc_stack))
-                    ('over (over$ loc_stack))
-                    ('rot (rot$ loc_stack))
-                    ('depth (depth$ loc_stack))
-                    ('and (and$ loc_stack))
-                    ('or (or$ loc_stack))
-                    ('not (not$ loc_stack))
-                    ('= (=$ loc_stack))
-                    ('> (>$ loc_stack))
-                    ('< (<$ loc_stack))
-                    (else loc_stack))))
-
+          (let* ((current_symb (vector-ref program ind))
+                 (new_stack (if (and (equal? func-ignore #f) (equal? if-ignore #f))
+                                (case current_symb
+                                  ('+ (+$ loc_stack))
+                                  ('- (-$ loc_stack))
+                                  ('* (*$ loc_stack))
+                                  ('/ (/$ loc_stack))
+                                  ('mod (mod$ loc_stack))
+                                  ('neg (neg$ loc_stack))
+                                  ('drop (drop$ loc_stack))
+                                  ('swap (swap$ loc_stack))
+                                  ('dup (dup$ loc_stack))
+                                  ('over (over$ loc_stack))
+                                  ('rot (rot$ loc_stack))
+                                  ('depth (depth$ loc_stack))
+                                  ('and (and$ loc_stack))
+                                  ('or (or$ loc_stack))
+                                  ('not (not$ loc_stack))
+                                  ('= (=$ loc_stack))
+                                  ('> (>$ loc_stack))
+                                  ('< (<$ loc_stack))
+                                  (else loc_stack)) loc_stack)))
             (cond
-              ((number? current_symb) (inner new_program (cons current_symb loc_stack)))
-              ((my-element? current_symb oper_with_stack) (inner new_program new_stack))
-              ((equal? current_symb 'define) (begin
-                                               (set! env
-                                                     (append env `((,(vector-ref program 1)
-                                                                    ,(add_issue new_program)))))
-                                               (inner (after_issue new_program) new_stack)))
-              ((equal? current_symb 'end) (inner new_program loc_stack))
-              ((equal? current_symb 'if) (if (not (equal? (car loc_stack) 0))
-                                             (inner (true_if new_program) (cdr new_stack))
-                                             (inner (false_if new_program) (cdr new_stack))))
-              ((assoc current_symb env) (inner
-                                         (list->vector (append
-                                                        (vector->list (cadr (assoc current_symb env)))
-                                                        (vector->list new_program)))
-                                         loc_stack))
-              ((equal? current_symb 'exit) (inner (after_issue program) loc_stack))))))))
+              ;; end of definition of the article
+              ((and (null? return) (equal? current_symb 'end))
+               (inner new_stack (+ ind 1) #f return if-ignore))
+              
+              ;; end of execution of the article and return up the call stack
+              ((and (not (null? return)) (equal? current_symb 'end))
+               (inner new_stack (car return) #f (cdr return) if-ignore))
+              
+              ;; definition of the article so ignoring the program
+              ((equal? func-ignore #t)
+               (inner new_stack (+ ind 1) func-ignore return if-ignore))
+              
+              ;; end of if-statement
+              ((equal? current_symb 'endif)
+               (inner new_stack (+ ind 1) func-ignore return #f))
+              
+              ;; if-statement is false so ignoring the program
+              ((equal? if-ignore #t)
+               (inner new_stack (+ ind 1) func-ignore return if-ignore))
+              
+              ;; exit is outside the articles so we are completing the program
+              ((and (null? return) (equal? current_symb 'exit))
+               (inner new_stack end func-ignore return if-ignore))
+              
+              ;; exit is in the articles so we are moving up the call stack
+              ((and (not (null? return)) (equal? current_symb 'exit))
+               (inner new_stack (car return) func-ignore (cdr return) if-ignore))
+              
+              ;; symbol is a number so it add to stack
+              ((number? current_symb)
+               (inner (cons current_symb loc_stack) (+ ind 1) func-ignore return if-ignore))
+              
+              ;; check if term is an operation with stack
+              ((my-element? current_symb oper_with_stack)
+               (inner new_stack (+ ind 1) func-ignore return if-ignore))
+              
+              ;; definition of the article 
+              ((equal? current_symb 'define)
+               (begin
+                 (set! env
+                       (append env
+                               (cons
+                                (cons (vector-ref program (+ ind 1))
+                                      (cons (+ ind 2) '())) '())))
+                 (inner new_stack (+ ind 1) #t return if-ignore)))
+              
+              ;; executing previously defined  article
+              ((assoc current_symb env)
+               (inner new_stack (cadr (assoc current_symb env)) func-ignore (cons (+ ind 1) return) if-ignore))
+              
+              ;; if-statement
+              ((equal? current_symb 'if)
+               (if (not (equal? (car loc_stack) 0))
+                   (inner (cdr new_stack) (+ ind 1) func-ignore return if-ignore)
+                   (inner (cdr new_stack) (+ ind 1) func-ignore return #t)))))))))
 
 
 ;; Arithmetic operations
@@ -148,48 +187,7 @@
     ((equal? x (car xs)) #t)
     (else (my-element? x (cdr xs)))))
 
-
-;; Control structures
-
-;; Define/end/exit
-(define (add_issue program)
-  (let loop ((res '())
-             (ind 0)
-             (program program))
-    (cond
-      ((equal? (vector-ref program 0) 'end) (list->vector (append res (cons 'end '()))))
-      ((= ind 0) (loop res (+ ind 1) (list->vector (cdr (vector->list program)))))
-      (else (loop (append res (cons (vector-ref program 0) '())) ind (list->vector (cdr (vector->list program))))))))
-
-
-(define (after_issue program)
-  (let loop ((program program))
-    (cond
-      ((equal? program #()) #())
-      ((equal? (vector-ref program 0) 'end) (list->vector (cdr (vector->list program))))
-      ((equal? (vector-ref program 0) 'define) #())
-      (else (loop (list->vector (cdr (vector->list program))))))))
-
-
-;; If/endif
-(define (true_if program)
-  (let loop ((res '())
-             (program program))
-    (cond
-      ((equal? (vector-ref program 0) 'endif) (list->vector (append res (cdr (vector->list program)))))
-      (else (loop (append res (cons (vector-ref program 0) '())) (list->vector (cdr (vector->list program))))))))
-
-(define (false_if program)
-  (let loop ((program program))
-    (cond
-      ((equal? (vector-ref program 0) 'endif) (list->vector (cdr (vector->list program))))
-      (else (loop (list->vector (cdr (vector->list program))))))))
-
-  
 ;; Testing
-
-
-
 
 (define tests
   (list (test (interpret #(1) '()) '(1))
@@ -308,3 +306,7 @@
               '(-1 0))))
 
 ;; (run-tests tests)
+
+
+
+
