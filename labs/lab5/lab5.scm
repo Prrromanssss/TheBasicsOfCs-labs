@@ -67,7 +67,7 @@
               ((and (not (null? return)) (equal? current_symb 'exit))
                (inner new_stack (car return) func-ignore (cdr return) if-ignore))
               
-              ;; symbol is a number so it add to stack
+              ;; symbol is a number so it is added to stack
               ((number? current_symb)
                (inner (cons current_symb loc_stack) (+ ind 1) func-ignore return if-ignore))
               
