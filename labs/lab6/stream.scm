@@ -10,14 +10,6 @@
       (cadr stream)
       (caar stream)))
 
-;; Запрос первых двух символов
-(define (peek2 stream)
-  (if (null? (car stream))
-      (cadr stream)
-      (if (null? (cdar stream))
-          (list (caar stream))
-          (list (caar stream) (cadar stream)))))
-
 ;; Продвижение вперёд
 (define (next stream)
   (let ((n (peek stream)))

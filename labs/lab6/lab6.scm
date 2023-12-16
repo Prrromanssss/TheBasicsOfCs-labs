@@ -192,7 +192,7 @@
               #f)
         (test (scan-frac "-/1")
               #f)))
- (run-tests scan-frac-tests)
+;; (run-tests scan-frac-tests)
 
 ;; <Список дробей> ::= <Пробелы> <Дробь> <Пробелы> <Список дробей> | <Пусто>
 ;; <Пробелы> ::= ПРОБЕЛЬНЫЙ-СИМВОЛ <Пробелы> | <Пусто>
@@ -250,7 +250,164 @@
         (test (scan-many-fracs
                "\t1/2 1/32/-5")
               #f)))
-
 ;; (run-tests scan-many-fracs-tests)
 
 
+;; Number 2
+
+;; <Program>  ::= <Articles> <Body> .
+;; <Articles> ::= <Article> <Articles> | <Empty> .
+;; <Article>  ::= define word <Program> end .
+;; <Body>     ::= if <Body> endif <Body> | integer <Body> | word <Body> | <Empty> .
+
+
+(define (parse tokens)
+  (let ((tree '())
+        (env '(+ - * / exit
+               mod neg drop swap
+               dup over rot and
+               = > < not or depth)))
+
+    (define (my-element? x xs)
+      (cond
+        ((null? xs) #f)
+        ((equal? x (car xs)) #t)
+        (else (my-element? x (cdr xs)))))
+
+    ;; <Program> ::= <Articles> <Body> .
+    (define (program stream error)
+      (cond ((start-articles? (peek stream))
+             (let* ((term-atricles (articles stream error))
+                    (term-body (parse-body stream error)))
+               (list term-atricles term-body)))
+            (else (error #f))))
+
+    (define (start-articles? token)
+      (or (equal? token 'define) #t))
+
+    (define (not-forbidden-symb? token)
+      (and (not (equal? token 'define))
+           (not (equal? token 'if))
+           (not (equal? token 'endif))
+           (not (equal? token 'end))
+           (not (equal? token 'EOF))
+           (symbol? token)))
+
+     (define (word? token)
+      (and (my-element? token env) (not-forbidden-symb? token)))
+
+    ;; <Articles> ::= <Article> <Articles> | <Empty> .
+    (define (articles stream error)
+      (cond ((start-article? (peek stream))
+             (let* ((term-article (parse-article stream error))
+                    (term-articles (articles stream error)))
+               (cons term-article term-articles)))
+            (else '())))
+
+    (define (start-article? token)
+      (equal? token 'define))
+
+    ;; <Article> ::= define word <Body> end .
+    (define (parse-article stream error)
+      (cond ((equal? (peek stream) 'define)
+             (let* ((term-define (next stream))
+                    (term-word (if (not-forbidden-symb? (peek stream))
+                                   (begin
+                                     (set! env (cons (peek stream) env)) (next stream)) (error #f)))
+                    (term-body (parse-body stream error))
+                    (term-end (if (equal? (peek stream) 'end) (next stream) (error #f))))
+               (list term-word term-body)))
+            (else (error #f))))
+
+    ;; <Body> ::= if <Body> endif <Body> | integer <Body> | word <Body> | <Empty> .
+    (define (parse-body stream error)
+      (cond ((equal? (peek stream) 'if)
+             (let* ((term-if (next stream))
+                    (term-body-head (parse-body stream error))
+                    (term-endif (if (equal? (peek stream) 'endif) (next stream) (error #f)))
+                    (term-body-tail (parse-body stream error)))
+               (cons (list term-if term-body-head) term-body-tail)))
+       
+            ((number? (peek stream))
+             (let* ((term-integer (next stream))
+                    (term-body (parse-body stream error)))
+               (cons term-integer term-body)))
+
+            ((word? (peek stream))
+             (let* ((term-word (next stream))
+                    (term-body (parse-body stream error)))
+               (cons term-word term-body)))
+            (else '())))
+
+    (define stream (make-stream (vector->list tokens) 'EOF))
+  
+    (call-with-current-continuation
+     (lambda (error)
+       (set! tree (program stream error))
+       (if (equal? (peek stream) 'EOF) tree #f)))))
+
+
+(define parse-tests
+  (list (test (parse #(1 2 +))
+              '(() (1 2 +)))
+        (test (parse #(x dup 0 swap if drop -1 endif))
+              #f)
+        (test (parse #( define -- 1 - end
+                        define =0? dup 0 = end
+                        define =1? dup 1 = end
+                        define factorial
+                        =0? if drop 1 exit endif
+                        =1? if drop 1 exit endif
+                        dup --
+                        factorial
+                        *
+                        end
+                        0 factorial
+                        1 factorial
+                        2 factorial
+                        3 factorial
+                        4 factorial ))
+              '(((-- (1 -))
+                (=0? (dup 0 =))
+                (=1? (dup 1 =))
+                (factorial
+                 (=0? (if (drop 1 exit)) =1? (if (drop 1 exit)) dup -- factorial *)))
+               (0 factorial 1 factorial 2 factorial 3 factorial 4 factorial)))
+        (test (parse #(define word w1 w2 w3))
+              #f)
+        (test (parse #(0 if 1 if 2 endif 3 endif 4))
+              '(() (0 (if (1 (if (2)) 3)) 4)))
+        (test (parse #(define =0? dup 0 = end
+                        define gcd
+                        =0? if drop exit endif
+                        swap over mod
+                        gcd
+                        end
+                        90 99 gcd
+                        234 8100 gcd))
+              '(((=0? (dup 0 =))
+                (gcd (=0?
+                      (if (drop exit))
+                      swap over mod
+                      gcd)))
+               (90 99 gcd
+                234 8100 gcd)))
+        (test (parse #(if define end))
+              #f)
+        (test (parse #(if end))
+              #f)
+        (test (parse #(if endif))
+              '(() ((if ()))))
+        (test (parse #(if define endif end))
+              #f)
+        (test (parse #(define end end))
+              #f)
+        (test (parse #(define if end))
+              #f)
+        (test (parse #(define if  end endif))
+              #f)
+        (test (parse #())
+              '(()()))
+        (test (parse #(+ + +))
+              '(()(+ + +)))))
+;; (run-tests parse-tests)
