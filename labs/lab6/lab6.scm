@@ -14,6 +14,7 @@
 
 ;; 1.1
 (define (check-frac str)
+  ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
   (define (check stream error)
     (signed-num stream error)
     (sign stream #\/ error)
@@ -23,7 +24,8 @@
     (if (equal? (peek stream) term)
         (next stream)
         (error #f)))
-
+  
+  ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
   (define (signed-num stream error)
     (cond ((equal? (peek stream) #\+)
            (next stream)
@@ -37,13 +39,15 @@
                (error #f)))
           ((unsigned-num stream error) #t)
           (else (error #f))))
-  
+
+  ;; <Unsigned-num> ::= Digit <Digit-tail>
   (define (unsigned-num stream error)
     (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
            (next stream)
            (tail-num stream error))
           (else (error #f))))
 
+  ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
   (define (tail-num stream error)
     (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
            (next stream)
@@ -102,6 +106,8 @@
 ;; 1.2
 (define (scan-frac str)
   (let ((res '()))
+
+    ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
     (define (scan stream error)
       (signed-num stream error)
       (sign stream #\/ error)
@@ -114,6 +120,7 @@
             (next stream))
           (error #f)))
 
+    ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
     (define (signed-num stream error)
       (cond ((equal? (peek stream) #\+)
              (begin
@@ -131,7 +138,8 @@
                  (error #f)))
             ((unsigned-num stream error) #t)
             (else (error #f))))
-  
+    
+    ;; <Unsigned-num> ::= Digit <Digit-tail>
     (define (unsigned-num stream error)
       (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
              (begin
@@ -140,6 +148,7 @@
              (tail-num stream error))
             (else (error #f))))
 
+    ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
     (define (tail-num stream error)
       (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
              (begin
@@ -257,7 +266,7 @@
 
 ;; <Program>  ::= <Articles> <Body> .
 ;; <Articles> ::= <Article> <Articles> | <Empty> .
-;; <Article>  ::= define word <Program> end .
+;; <Article>  ::= define word <Body> end .
 ;; <Body>     ::= if <Body> endif <Body> | integer <Body> | word <Body> | <Empty> .
 
 
@@ -313,7 +322,9 @@
              (let* ((term-define (next stream))
                     (term-word (if (not-forbidden-symb? (peek stream))
                                    (begin
-                                     (set! env (cons (peek stream) env)) (next stream)) (error #f)))
+                                     (set! env (cons (peek stream) env))
+                                     (next stream))
+                                   (error #f)))
                     (term-body (parse-body stream error))
                     (term-end (if (equal? (peek stream) 'end) (next stream) (error #f))))
                (list term-word term-body)))
