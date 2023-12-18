@@ -94,7 +94,6 @@
 </td>
 <td style="text-align: left; vertical-align: top">Сумма n1 и n2</td>
   </tr>
-  ```
 
   <tr>
 <td style="text-align: left; vertical-align: top">−</td>
@@ -111,7 +110,6 @@
 </td>
 <td style="text-align: left; vertical-align: top">Произведение n2 на n1</td>
   </tr>
-  ```
 
   <tr>
 <td style="text-align: left; vertical-align: top">/</td>
