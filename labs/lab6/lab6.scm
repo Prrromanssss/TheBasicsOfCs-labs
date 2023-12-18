@@ -5,11 +5,11 @@
 
 ;; Number 1
 
-;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-;; <Пустота> ::= 
+;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+;; <Unsigned-num> ::= Digit <Digit-tail>
+;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+;; <Empty> ::= 
 
 
 ;; 1.1
@@ -92,11 +92,11 @@
 ;; (run-tests check-frac-tests)
 
 
-;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-;; <Пустота> ::= 
+;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+;; <Unsigned-num> ::= Digit <Digit-tail>
+;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+;; <Empty> ::= 
 
 
 ;; 1.2
@@ -194,13 +194,13 @@
               #f)))
 ;; (run-tests scan-frac-tests)
 
-;; <Список дробей> ::= <Пробелы> <Дробь> <Пробелы> <Список дробей> | <Пусто>
-;; <Пробелы> ::= ПРОБЕЛЬНЫЙ-СИМВОЛ <Пробелы> | <Пусто>
-;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-;; <Пустота> ::=
+;; <List-of-fractions> ::= <Spaces> <Fraction> <Spaces> <List-of-fractions> | <Empty>
+;; <Spaces> ::= SPACE <Spaces> | <Empty>
+;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+;; <Unsigned-num> ::= Digit <Digit-tail>
+;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+;; <Empty> ::=
 
 
 ;; 1.3
