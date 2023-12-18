@@ -19,11 +19,11 @@
         для преобразования строки к числу.
 
         ``` example
-        ;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-        ;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-        ;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-        ;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-        ;; <Пустота> ::= 
+        ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+        ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+        ;; <Unsigned-num> ::= Digit <Digit-tail>
+        ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+        ;; <Empty> ::= 
         ```
 
         ``` scheme
@@ -31,7 +31,9 @@
 
         (define call/cc call-with-current-continuation)
 
+        ;; 1.1
         (define (check-frac str)
+            ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
             (define (check stream error)
                 (signed-num stream error)
                 (sign stream #\/ error)
@@ -42,38 +44,41 @@
                     (next stream)
                     (error #f)))
 
+            ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
             (define (signed-num stream error)
                 (cond ((equal? (peek stream) #\+)
-                    (next stream)
-                    (if (unsigned-num stream error)
-                        #t
-                        (error #f)))
-                    ((equal? (peek stream) #\-)
-                    (next stream)
-                    (if (unsigned-num stream error)
-                        #t
-                        (error #f)))
-                    ((unsigned-num stream error) #t)
-                    (else (error #f))))
-            
+                        (next stream)
+                        (if (unsigned-num stream error)
+                            #t
+                            (error #f)))
+                        ((equal? (peek stream) #\-)
+                        (next stream)
+                        (if (unsigned-num stream error)
+                            #t
+                            (error #f)))
+                        ((unsigned-num stream error) #t)
+                        (else (error #f))))
+
+            ;; <Unsigned-num> ::= Digit <Digit-tail>
             (define (unsigned-num stream error)
                 (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
-                    (next stream)
-                    (tail-num stream error))
-                    (else (error #f))))
+                        (next stream)
+                        (tail-num stream error))
+                        (else (error #f))))
 
+            ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
             (define (tail-num stream error)
                 (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
-                    (next stream)
-                    (tail-num stream error))
-                    (else #t)))
+                        (next stream)
+                        (tail-num stream error))
+                        (else #t)))
 
             (define stream (make-stream (string->list str) 'EOF))
 
             (call/cc
-            (lambda (error)
-                (check stream error)
-                (equal? (peek stream) 'EOF))))
+                (lambda (error)
+                    (check stream error)
+                    (equal? (peek stream) 'EOF))))
         ```
 
         ``` scheme
@@ -122,11 +127,11 @@
         посимвольной обработки сканером.
 
         ``` example
-        ;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-        ;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-        ;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-        ;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-        ;; <Пустота> ::= 
+        ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+        ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+        ;; <Unsigned-num> ::= Digit <Digit-tail>
+        ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+        ;; <Empty> ::= 
         ```
 
         ``` scheme
@@ -136,63 +141,68 @@
 
         (define (scan-frac str)
             (let ((res '()))
+
+                ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
                 (define (scan stream error)
-                (signed-num stream error)
-                (sign stream #\/ error)
-                (unsigned-num stream error))
+                    (signed-num stream error)
+                    (sign stream #\/ error)
+                    (unsigned-num stream error))
 
                 (define (sign stream term error)
-                (if (equal? (peek stream) term)
-                    (begin
-                        (set! res (append res (cons (peek stream) '())))
-                        (next stream))
-                    (error #f)))
+                    (if (equal? (peek stream) term)
+                        (begin
+                            (set! res (append res (cons (peek stream) '())))
+                            (next stream))
+                        (error #f)))
 
+                ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
                 (define (signed-num stream error)
-                (cond ((equal? (peek stream) #\+)
-                        (begin
-                        (set! res (append res (cons (peek stream) '())))
-                        (next stream))
-                        (if (unsigned-num stream error)
-                            #t
-                            (error #f)))
-                        ((equal? (peek stream) #\-)
-                        (begin
-                        (set! res (append res (cons (peek stream) '())))
-                        (next stream))
-                        (if (unsigned-num stream error)
-                            #t
-                            (error #f)))
-                        ((unsigned-num stream error) #t)
-                        (else (error #f))))
-            
+                    (cond ((equal? (peek stream) #\+)
+                            (begin
+                            (set! res (append res (cons (peek stream) '())))
+                            (next stream))
+                            (if (unsigned-num stream error)
+                                #t
+                                (error #f)))
+                            ((equal? (peek stream) #\-)
+                            (begin
+                            (set! res (append res (cons (peek stream) '())))
+                            (next stream))
+                            (if (unsigned-num stream error)
+                                #t
+                                (error #f)))
+                            ((unsigned-num stream error) #t)
+                            (else (error #f))))
+                
+                ;; <Unsigned-num> ::= Digit <Digit-tail>
                 (define (unsigned-num stream error)
-                (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
-                        (begin
-                        (set! res (append res (cons (peek stream) '())))
-                        (next stream))
-                        (tail-num stream error))
-                        (else (error #f))))
+                    (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
+                            (begin
+                            (set! res (append res (cons (peek stream) '())))
+                            (next stream))
+                            (tail-num stream error))
+                            (else (error #f))))
 
+                ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
                 (define (tail-num stream error)
-                (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
-                        (begin
-                        (set! res (append res (cons (peek stream) '())))
-                        (next stream))
-                        (tail-num stream error))
-                        (else #t)))
+                    (cond ((and (char? (peek stream)) (char-numeric? (peek stream)))
+                            (begin
+                            (set! res (append res (cons (peek stream) '())))
+                            (next stream))
+                            (tail-num stream error))
+                            (else #t)))
 
                 (define (print-frac lst)
-                (string->number (list->string lst)))
+                    (string->number (list->string lst)))
 
                 (define stream (make-stream (string->list str) 'EOF))
 
                 (call/cc
-                (lambda (error)
-                (scan stream error)
-                (if (equal? (peek stream) 'EOF)
-                    (print-frac res)
-                    #f)))))
+                    (lambda (error)
+                        (scan stream error)
+                        (if (equal? (peek stream) 'EOF)
+                            (print-frac res)
+                            #f)))))
         ```
 
         ``` scheme
@@ -243,13 +253,13 @@
         строке до её посимвольной обработки сканером.
 
         ``` example
-        ;; <Список дробей> ::= <Пробелы> <Дробь> <Пробелы> <Список дробей> | <Пусто>
-        ;; <Пробелы> ::= ПРОБЕЛЬНЫЙ-СИМВОЛ <Пробелы> | <Пусто>
-        ;; <Дробь> ::= <Число-со-знаком> / <Число-без-знака>
-        ;; <Число-со-знаком> ::= + <Число-без-знака> | - <Число-без-знака> | <Число-без-знака>
-        ;; <Число-без-знака> ::= ЦИФРА <Хвост-числа>
-        ;; <Хвост-числа> ::= ЦИФРА <Хвост-числа> | <Пустота>
-        ;; <Пустота> ::=
+        ;; <List-of-fractions> ::= <Spaces> <Fraction> <Spaces> <List-of-fractions> | <Empty>
+        ;; <Spaces> ::= SPACE <Spaces> | <Empty>
+        ;; <Fraction> ::= <Signed-num> / <Unsigned-num>
+        ;; <Signed-num> ::= + <Unsigned-num> | - <Unsigned-num> | <Unsigned-num>
+        ;; <Unsigned-num> ::= Digit <Digit-tail>
+        ;; <Digit-tail> ::= Digit <Digit-tail> | <Empty>
+        ;; <Empty> ::=
         ```
 
         ``` scheme
@@ -260,37 +270,37 @@
         (define (scan-many-fracs str)
             (define (clean-string str)
                 (define (concat str1 str2)
-                (list->string
-                (append (string->list str1) (string->list str2))))
+                    (list->string
+                    (append (string->list str1) (string->list str2))))
 
-                (let loop ((res '())
-                        (current-string "")
-                        (data (string->list (concat str " "))))
-                (cond ((null? data) res)
-                        ((and
+            (let loop ((res '())
+                    (current-string "")
+                    (data (string->list (concat str " "))))
+            (cond ((null? data) res)
+                    ((and
                         (char? (car data))
                         (char-whitespace? (car data))
                         (not (equal? current-string "")))
-                        (loop (append res (cons current-string '()))
-                            ""
-                            (cdr data)))
-                        ((and
+                    (loop (append res (cons current-string '()))
+                        ""
+                        (cdr data)))
+                    ((and
                         (char? (car data))
                         (char-whitespace? (car data))
                         (equal? current-string ""))
-                        (loop res
-                            current-string
-                            (cdr data)))
-                        ((and
+                    (loop res
+                        current-string
+                        (cdr data)))
+                    ((and
                         (char? (car data))
                         (not (char-whitespace? (car data))))
-                        (loop res (concat current-string (make-string 1 (car data))) (cdr data))))))
+                    (loop res (concat current-string (make-string 1 (car data))) (cdr data))))))
 
-            (let inner ((data (clean-string str))
+        (let inner ((data (clean-string str))
                     (res '()))
-                (cond ((null? data) res)
-                    ((equal? (scan-frac (car data)) #f) #f)
-                    (else (inner (cdr data) (append res (cons (scan-frac (car data)) '())))))))
+            (cond ((null? data) res)
+                ((equal? (scan-frac (car data)) #f) #f)
+                (else (inner (cdr data) (append res (cons (scan-frac (car data)) '())))))))
         ```
 
         ``` scheme
@@ -445,7 +455,9 @@
                     (let* ((term-define (next stream))
                             (term-word (if (not-forbidden-symb? (peek stream))
                                         (begin
-                                            (set! env (cons (peek stream) env)) (next stream)) (error #f)))
+                                            (set! env (cons (peek stream) env))
+                                            (next stream))
+                                        (error #f)))
                             (term-body (parse-body stream error))
                             (term-end (if (equal? (peek stream) 'end) (next stream) (error #f))))
                     (list term-word term-body)))
