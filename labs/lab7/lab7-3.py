@@ -1,4 +1,4 @@
-#!/bin/bash python3
+#!/usr/bin/env python3
 
 import argparse
 from random import choice
