@@ -7,3 +7,5 @@
 .#*.scm
 
 .DS_Store
+
+.vscode

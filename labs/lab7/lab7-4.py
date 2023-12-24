@@ -1,5 +1,6 @@
 import functools
 
+
 def memo(old_func):
     cash = {}
 
@@ -16,7 +17,3 @@ def fib(n):
     if n < 2:
         return 1
     return fib(n - 1) + fib(n - 2)
-
-fib = memo(fib)
-
-print(fib(400))
