@@ -1,3 +1,5 @@
+#!/bin/bash python3
+
 import argparse
 from random import choice
 from string import ascii_lowercase, digits, punctuation
