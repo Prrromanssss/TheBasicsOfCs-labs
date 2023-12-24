@@ -73,47 +73,45 @@
     Оформите логику приложения в виде отдельной функции и поместите её
     в отдельный модуль.
 
-    -   Простой генератор паролей на Raku
+    ```python
+    #!/usr/bin/env python3
 
-        ```python
-        #!/usr/bin/env python3
-
-        import argparse
-        from random import choice
-        from string import ascii_lowercase, digits, punctuation
+    import argparse
+    from random import choice
+    from string import ascii_lowercase, digits, punctuation
 
 
-        def random_string(*, len_str, number_of_str):
-            elements_in_str = ascii_lowercase + digits + punctuation
-            return [''.join(choice(elements_in_str)
-                            for _ in range(len_str)) for _ in range(number_of_str)]
+    def random_string(*, len_str, number_of_str):
+        elements_in_str = ascii_lowercase + digits + punctuation
+        return [''.join(choice(elements_in_str)
+                        for _ in range(len_str)) for _ in range(number_of_str)]
 
 
-        def main():
-            parser = argparse.ArgumentParser()
-            parser.add_argument(
-                'length_of_the_string',
-                default=5,
-                type=int,
-                nargs='?'
-            )
-            parser.add_argument(
-                'number_of_the_strings',
-                default=5,
-                type=int,
-                nargs='?'
-            )
-            args = parser.parse_args()
+    def main():
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            'length_of_the_string',
+            default=5,
+            type=int,
+            nargs='?'
+        )
+        parser.add_argument(
+            'number_of_the_strings',
+            default=5,
+            type=int,
+            nargs='?'
+        )
+        args = parser.parse_args()
 
-            res = random_string(
-                len_str=args.length_of_the_string,
-                number_of_str=args.number_of_the_strings)
-            print(res)
+        res = random_string(
+            len_str=args.length_of_the_string,
+            number_of_str=args.number_of_the_strings)
+        print(res)
 
 
-        if __name__ == "__main__":
-            main()
-        ```
+    if __name__ == "__main__":
+        main()
+    ```
 
 4.  **Задание повышенной сложности.** Ha выбранном скриптовом языке
     напишите функцию, которая принимает произвольную чистую функцию
