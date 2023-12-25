@@ -9,7 +9,7 @@ program_path=$1
 period=$2
 
 if [[ ! -f $program_path ]]; then
-    echo "Error: progra, path is not a file"
+    echo "Error: program path is not a file"
     exit 2
 fi
 
