@@ -1,5 +1,5 @@
-from string import ascii_lowercase, digits, punctuation
 from random import choice
+from string import ascii_lowercase, digits, punctuation
 
 
 def random_string(*, len_str, number_of_str):
