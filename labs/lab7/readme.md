@@ -32,21 +32,36 @@
     ``` bash
     #!/bin/bash
 
-    if [[ "$#" -ne 2 ]]; then
-        echo "Usage: $0 <filename> <period time>"
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: ./script.sh <filepath> <period time(t) in minutes>"
         exit 1
     fi
 
+    program_path=$1
+    period=$2
 
-    script_path=$1
-    per_time=$2
+    if [[ ! -f $program_path ]]; then
+        echo "Error: progra, path is not a file"
+        exit 2
+    fi
 
-    timestamp=$(date +%Y%m%d%H%M%S)
-    output_log="output_$timestamp.log"
-    error_log="error_$timestamp.log"
+    output_file="output_$(date +%Y%m%d_%H%M%S).log"
+    error_file="error_$(date +%Y%m%d_%H%M%S).log"
+
+    execute_program() {
+        echo > running.lock
+        $program_path >> $output_file 2>> $error_file
+        rm running.lock
+    }
+
     while true; do
-        $program_path >> $output_log 2>> $error_log
-        sleep $(( $per_time*60))
+        if [[ ! -e "running.lock" ]]; then
+            execute_program &
+            echo "Program has started."
+        else
+            echo "Program is running. Waiting for finish..."
+        fi
+        sleep $(($period * 60))
     done
     ```
 
@@ -74,17 +89,21 @@
     в отдельный модуль.
 
     ```python
-    #!/usr/bin/env python3
-
-    import argparse
-    from random import choice
     from string import ascii_lowercase, digits, punctuation
+    from random import choice
 
 
     def random_string(*, len_str, number_of_str):
         elements_in_str = ascii_lowercase + digits + punctuation
         return [''.join(choice(elements_in_str)
                         for _ in range(len_str)) for _ in range(number_of_str)]
+    ```
+
+    ```python
+    #!/usr/bin/env python3
+
+    import argparse
+    from random_string import random_string
 
 
     def main():
