@@ -50,8 +50,8 @@ def main():
 
     args = parser.parse_args()
 
-    if not any(vars(args).values()):
-        parser.error('At least one of -c, -w, -l, -m is required.')
+    if not args.c and not args.w and not args.l and not args.m:
+        args.c = True
 
     if not args.file:
         count = wc(sys.stdin)
