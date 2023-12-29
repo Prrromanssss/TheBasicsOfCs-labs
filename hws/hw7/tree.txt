@@ -1,0 +1,64 @@
+/Users/nick/Desktop/VScodeProjects/Go
+├── .DS_Store
+├── Algorithms
+│   ├── go.mod
+│   ├── .DS_Store
+│   ├── prefix.go
+│   ├── sorting
+│   │   ├── selectionsort.go
+│   │   ├── quicksort.go
+│   │   └── heapsort.go
+│   ├── divide-and-conquer
+│   │   └── find_maximum_subarray.go
+│   ├── sorting_on_c
+│   │   ├── merge_sort.c
+│   │   ├── selection_sort.c
+│   │   └── insertion_sort.c
+│   └── main.go
+├── yandex
+│   ├── template.go.tmpl
+│   ├── go.mod
+│   ├── .DS_Store
+│   ├── chapter8
+│   │   └── textbook.go
+│   ├── chapter6
+│   │   └── test_textbook.go
+│   ├── test.go
+│   ├── chapter7
+│   │   ├── max.go
+│   │   ├── coins.go
+│   │   └── chest.go
+│   ├── chapter9
+│   │   └── textbook.go
+│   ├── test1
+│   │   └── main.go
+│   ├── chapter12-time
+│   │   └── number_last.go
+│   ├── go.sum
+│   ├── data.csv
+│   ├── state.cfg
+│   ├── input.txt
+│   ├── students
+│   │   └── students.go
+│   ├── log.txt
+│   ├── chapter13-log
+│   │   └── httpserver.go
+│   ├── life.py
+│   ├── sorting
+│   │   └── merge_sort.go
+│   ├── geometry
+│   │   └── geometry.go
+│   ├── chapter5
+│   │   ├── textbook_2.go
+│   │   ├── textbook_3.go
+│   │   ├── ex3.go
+│   │   ├── ex1-2.go
+│   │   ├── ex4.go
+│   │   └── textbook_1.go
+│   ├── .vscode
+│   ├── chapter4
+│   │   └── main.go
+│   ├── chapter15
+│       └── main.go
+├── .vscode
+    └── launch.json
