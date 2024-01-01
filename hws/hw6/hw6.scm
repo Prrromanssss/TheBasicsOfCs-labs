@@ -1,50 +1,11 @@
+(load "../../labs/lab6/stream.scm")
+(load "../../labs/lab3/lab3.scm")
 
-# Домашнее задание №6
+(define call/cc call-with-current-continuation)
+
+;; Number 1
 
 
-Реализуйте разбор арифметического выражения, записанного в традиционной
-инфиксной нотации, и его преобразование к выражению, записанному на
-языке Scheme. Выражения могут включать в себя числа (целые и с плавающей
-запятой, в том числе — в экспоненциальной форме), переменные (имена
-переменных могут состоять из одной или нескольких латинских букв),
-арифметические операции (`+`, `−`, `*`, `/` и `^`), унарный минус и
-круглые скобки.
-
-Задание выполните в три этапа:
-
-## 1. Лексический анализатор
-
-Разработайте лексическую структуру языка (грамматику разбора
-арифметического выражения на токены) и запишите ее в БНФ перед главной
-процедурой лексера. Процедура должна называться `tokenize`, принимать
-выражение в виде строки и возвращать последовательность токенов в виде
-списка. Лексемы исходной последовательности должны быть преобразованы:
-
-имена переменных и знаки операций — в символические константы Scheme,
-числа — в числовые константы Scheme соответствующего типа, скобки —
-в строки `"("` и `")"`. Пробельные символы должны игнорироваться
-лексером. Если исходная последовательность включает в себя недопустимые
-символы, лексер должен возвращать `#f`.
-
-Примеры вызова лексера:
-
-``` example
-(tokenize "1")
-  ⇒ (1)
-
-(tokenize "-a")
-  ⇒ (- a)
-
-(tokenize "-a + b * x^2 + dy")
-  ⇒ (- a + b * x ^ 2 + dy)
-
-(tokenize "(a - 1)/(b + 1)")
-  ⇒ ("(" a - 1 ")" / "(" b + 1 ")")
-```
-
-### БНФ
-
-``` example
 ;; <Expression> ::= <Spaces> <Object> <Spaces> <Expression> | <Empty>
 ;; <Spaces> ::= SPACE-SYMBOL <spaces> | <Empty>
 ;; <Object> ::= + | - | * | / | ^ | ( | ) | <Variable> <Digit>
@@ -53,12 +14,8 @@
 ;; <Digit> ::= DIGIT-SYMBOL <Digit-tail>
 ;; <Digit-tail> ::= DIGIT-SYMBOL <Digit-tail> | e <Digit-tail> | . <Digit-tail> | <Empty>
 ;; <Empty> ::=
-```
 
-### Реализация
 
-``` scheme
-(load "../../labs/lab6/stream.scm")
 
 (define (tokenize input)
   (let ((built-in-symbols '((#\- -)
@@ -175,12 +132,7 @@
      (lambda (error)
        (define tokens (parse-expression stream error))
        (if (equal? (peek stream) 'EOF) tokens #f)))))
-```
 
-### Тесты
-
-``` scheme
-(load "../../labs/lab3/lab3.scm")
 
 (define tokenize-tests
   (list (test (tokenize "1")
@@ -192,73 +144,18 @@
         (test (tokenize "(a - 1)/(b + 1)")
               '("(" a - 1 ")" / "(" b + 1 ")"))))
 
-(run-tests tokenize-tests)
-```
+;; (run-tests tokenize-tests)
 
-## 2. Синтаксический анализатор
 
-Синтаксический анализатор должен строить дерево разбора согласно
-следующей грамматике, учитывающей приоритет операторов:
+;; Number 2
 
-``` example
-Expr    ::= Term Expr' .
-Expr'   ::= AddOp Term Expr' | .
-Term    ::= Factor Term' .
-Term'   ::= MulOp Factor Term' | .
-Factor  ::= Power Factor' .
-Factor' ::= PowOp Power Factor' | .
-Power   ::= value | "(" Expr ")" | unaryMinus Power .
-```
-
-где терминалами являются `value` (число или переменная), круглые скобки
-и знаки операций.
-
-Синтаксический анализатор реализуйте в виде процедуры `parse`,
-принимающую последовательность токенов в виде списка (результат работы
-`tokenize`) и возвращающую дерево разбора, представленное в виде
-вложенных списков вида `(операнд-1 знак-операции операнд-2)` для
-бинарных операций и `(− операнд)` для унарного минуса. Числа и
-переменные в списки не упаковывайте. Многократно вложенные друг в друга
-списки из одного элемента вида `(((имя-или-число)))` не допускаются.
-
-Разбор осуществляйте методом рекурсивного спуска. Если исходная
-последовательность не соответствует грамматике, парсер должен возвращать
-`#f`.
-
-При построении дерева разбора соблюдайте общепринятую ассоциативность
-бинарых операторов: левую для сложения, вычитания, умножения и деления и
-правую для возведения в степень. Вложенность списков должна однозначно
-определять порядок вычисления значения выражения.
-
-Примеры вызова парсера:
-
-``` example
-; Ассоциативность левая
-;
-(parse (tokenize "a/b/c/d"))
-  ⇒ (((a / b) / c) / d)
-
-; Ассоциативность правая
-;
-(parse (tokenize "a^b^c^d"))
-  ⇒ (a ^ (b ^ (c ^ d)))
-
-; Порядок вычислений задан скобками
-;
-(parse (tokenize "a/(b/c)"))
-  ⇒ (a / (b / c))
-
-; Порядок вычислений определен только
-; приоритетом операций
-;
-(parse (tokenize "a + b/c^2 - d"))
-  ⇒ ((a + (b / (c ^ 2))) - d)
-```
-
-### Реализация
-
-``` scheme
-(load "../../labs/lab6/stream.scm")
+;; Expr    ::= Term Expr' .
+;; Expr'   ::= AddOp Term Expr' | .
+;; Term    ::= Factor Term' .
+;; Term'   ::= MulOp Factor Term' | .
+;; Factor  ::= Power Factor' .
+;; Factor' ::= PowOp Power Factor' | .
+;; Power   ::= value | "(" Expr ")" | unaryMinus Power .
 
 (define (parse tokens)
   ;; Expr    ::= Term Expr' .
@@ -332,12 +229,7 @@ Power   ::= value | "(" Expr ")" | unaryMinus Power .
    (lambda (error)
      (define tree (parse-expr stream error))
      (if (equal? (peek stream) 'EOF) tree #f))))               
-```
 
-### Тесты
-
-``` scheme
-(load "../../labs/lab3/lab3.scm")
 
 (define parse-tests
   (list (test (parse (tokenize "a + b + c+d"))
@@ -353,35 +245,8 @@ Power   ::= value | "(" Expr ")" | unaryMinus Power .
         (test (parse (tokenize "(-a)^1e10"))
               '((- a) ^ 1e10))))
 
-(run-tests parse-tests)
-```
+;; (run-tests parse-tests)
 
-## 3. Преобразователь дерева разбора в выражение на Scheme
-
-Реализуйте процедуру `tree->scheme`, преобразующую дерево, возвращенное
-процедурой `parse`, в выражение на языке Scheme. Полученное выражение
-должно быть пригодно для вычисления его значения интерпретатором языка
-Scheme.
-
-Для возведения в степень используйте встроенную процедуру Scheme `expt`.
-Не передавайте более двух аргументов встроенным процедурам для
-арифметических операций.
-
-Примеры вызова конвертера:
-
-``` example
-(tree->scheme (parse (tokenize "x^(a + 1)")))
-  ⇒ (expt x (+ a 1))
-
-(eval (tree->scheme (parse (tokenize "2^2^2^2")))
-      (interaction-environment))
-  ⇒ 65536
-```
-
-### Реализация
-
-``` scheme
-(load "../../labs/lab6/stream.scm")
 
 (define (tree->scheme tree)
   (cond ((not (list? tree))
@@ -395,12 +260,7 @@ Scheme.
         (else (list (cadr tree)
                     (tree->scheme (car tree))
                     (tree->scheme (caddr tree))))))
-```
 
-### Тесты
-
-``` scheme
-(load "../../labs/lab3/lab3.scm")
 
 (define tree->scheme-tests
   (list (test (tree->scheme (parse (tokenize "x^(a + 1)")))
@@ -409,5 +269,11 @@ Scheme.
                     (interaction-environment))
               65536)))
 
-(run-tests tree->scheme-tests)
-```
+;; (run-tests tree->scheme-tests)
+
+
+
+
+
+  
+  

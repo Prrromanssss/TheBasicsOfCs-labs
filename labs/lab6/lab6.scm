@@ -286,7 +286,7 @@
     ;; <Program> ::= <Articles> <Body> .
     (define (program stream error)
       (cond ((start-articles? (peek stream))
-             (let* ((term-atricles (articles stream error))
+             (let ((term-atricles (articles stream error))
                     (term-body (parse-body stream error)))
                (list term-atricles term-body)))
             (else (error #f))))
@@ -308,7 +308,7 @@
     ;; <Articles> ::= <Article> <Articles> | <Empty> .
     (define (articles stream error)
       (cond ((start-article? (peek stream))
-             (let* ((term-article (parse-article stream error))
+             (let ((term-article (parse-article stream error))
                     (term-articles (articles stream error)))
                (cons term-article term-articles)))
             (else '())))
@@ -319,7 +319,7 @@
     ;; <Article> ::= define word <Body> end .
     (define (parse-article stream error)
       (cond ((equal? (peek stream) 'define)
-             (let* ((term-define (next stream))
+             (let ((term-define (next stream))
                     (term-word (if (not-forbidden-symb? (peek stream))
                                    (begin
                                      (set! env (cons (peek stream) env))
@@ -333,19 +333,19 @@
     ;; <Body> ::= if <Body> endif <Body> | integer <Body> | word <Body> | <Empty> .
     (define (parse-body stream error)
       (cond ((equal? (peek stream) 'if)
-             (let* ((term-if (next stream))
+             (let ((term-if (next stream))
                     (term-body-head (parse-body stream error))
                     (term-endif (if (equal? (peek stream) 'endif) (next stream) (error #f)))
                     (term-body-tail (parse-body stream error)))
                (cons (list term-if term-body-head) term-body-tail)))
        
             ((number? (peek stream))
-             (let* ((term-integer (next stream))
+             (let ((term-integer (next stream))
                     (term-body (parse-body stream error)))
                (cons term-integer term-body)))
 
             ((word? (peek stream))
-             (let* ((term-word (next stream))
+             (let ((term-word (next stream))
                     (term-body (parse-body stream error)))
                (cons term-word term-body)))
             (else '())))
@@ -421,4 +421,4 @@
               '(()()))
         (test (parse #(+ + +))
               '(()(+ + +)))))
-;; (run-tests parse-tests)
+ (run-tests parse-tests)
