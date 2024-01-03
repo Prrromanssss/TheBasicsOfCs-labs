@@ -8,7 +8,7 @@
 
 ;; <Expression> ::= <Spaces> <Object> <Spaces> <Expression> | <Empty>
 ;; <Spaces> ::= SPACE-SYMBOL <spaces> | <Empty>
-;; <Object> ::= + | - | * | / | ^ | ( | ) | <Variable> <Digit>
+;; <Object> ::= + | - | * | / | ^ | ( | ) | R | <Variable> <Digit>
 ;; <Variable> ::= LETTER-SYMBOL <Variable-tail>
 ;; <Variable-tail> ::= LETTER-SYMBOL <Variable-tail> | <Empty>
 ;; <Digit> ::= DIGIT-SYMBOL <Digit-tail>
@@ -24,7 +24,8 @@
                             (#\/ /)
                             (#\^ ^)
                             (#\( "(")
-                            (#\) ")"))))
+                            (#\) ")")
+                            (#\R r))))
 
     (define (my-element? x xs)
       (cond
@@ -62,7 +63,7 @@
       (and (char? symbol) (char-whitespace? symbol)))
 
 
-    ;; <Object> ::= + | - | * | / | ^ | ( | ) | <Variable> <Digit>
+    ;; <Object> ::= + | - | * | / | ^ | ( | ) | R | <Variable> <Digit>
     (define (parse-object stream error)
       (cond ((start-built-in-symbol? (peek stream))
              (cadr (assoc (next stream) built-in-symbols)))
@@ -70,7 +71,7 @@
              (parse-variable stream error))
             ((start-digit? (peek stream))
              (parse-digit stream error))
-            (else (error #f))))
+            (else (error '()))))
 
     (define (start-built-in-symbol? symbol)
       (and (char? symbol) (assoc symbol built-in-symbols)))
@@ -111,19 +112,22 @@
       (and (char? symbol) (char-numeric? symbol)))
 
     
-    ;; <Digit-tail> ::= DIGIT-SYMBOL <Digit-tail> | e <Digit-tail> | . <Digit-tail> | <Empty>
+    ;; <Digit-tail> ::= DIGIT-SYMBOL <Digit-tail> | e <Digit-tail> | - <Digit-tail> | . <Digit-tail> | <Empty>
     (define (parse-digit-tail stream error)
       (cond ((start-digit-tail? (peek stream))
              (let ((term-digit (next stream))
                    (term-digit-tail (parse-digit-tail stream error)))
                (cons term-digit term-digit-tail)))
+            ((start-variable? (peek stream))
+             (error #f))
             (else '())))
 
     (define (start-digit-tail? symbol)
       (and (char? symbol) (or
                            (start-digit? symbol)
                            (char=? #\e symbol)
-                           (char=? #\. symbol))))
+                           (char=? #\. symbol)
+                           (char=? #\- symbol))))
  
 
     (define stream (make-stream (string->list input) 'EOF))
@@ -142,7 +146,13 @@
         (test (tokenize "-a + b * x^2 + dy")
               '(- a + b * x ^ 2 + dy))
         (test (tokenize "(a - 1)/(b + 1)")
-              '("(" a - 1 ")" / "(" b + 1 ")"))))
+              '("(" a - 1 ")" / "(" b + 1 ")"))
+        (test (tokenize "6.022e23 * 1.38e-23 is R")
+               '(6.022e+23 * 1.38e-23 is r))
+        (test (tokenize "12x34 56y78")
+              #f)
+        (test (tokenize "            ")
+              '())))
 
 ;; (run-tests tokenize-tests)
 
@@ -223,12 +233,12 @@
            (next stream))
           (else (error #f))))
 
-  (define stream (make-stream tokens 'EOF))
+  (define stream (make-stream tokens "EOF"))
   
   (call/cc
    (lambda (error)
      (define tree (parse-expr stream error))
-     (if (equal? (peek stream) 'EOF) tree #f))))               
+     (and (equal? (peek stream) "EOF") tree))))               
 
 
 (define parse-tests
@@ -243,11 +253,17 @@
         (test (parse (tokenize "a + b/c^2 - d"))
               '((a + (b / (c ^ 2))) - d))
         (test (parse (tokenize "(-a)^1e10"))
-              '((- a) ^ 1e10))))
+              '((- a) ^ 1e10))
+        (test (parse (quote (a * b +)))
+              #f)
+        (test (parse (quote ()))
+              #f)
+        ))
 
 ;; (run-tests parse-tests)
 
 
+;; Number 3
 (define (tree->scheme tree)
   (cond ((not (list? tree))
          tree)
